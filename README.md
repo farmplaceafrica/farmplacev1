@@ -20,10 +20,10 @@ FarmPlace is a digital platform that empowers African farmers to create their ow
 
 ## 🛠 Tech Stack
 
-- **Frontend**: [Next.js](https://nextjs.org/)  
+- **Frontend**: [Next.js](https://nextjs.org/)
 - **Backend**: 🧐🧐🧐🧐
-- **Database**: [MongoDB](https://www.mongodb.com/)  
-- **AI Integration**: Dialogflow and others... 
+- **Database**: [MongoDB](https://www.mongodb.com/)
+- **AI Integration**: Dialogflow and others...
 - **Hosting**: Cloud-based
 
 ---
@@ -35,7 +35,6 @@ FarmPlace is a digital platform that empowers African farmers to create their ow
 - Resource Hub usage statistics
 - AI chatbot feedback and usage
 - Regional adoption rates
-
 
 ---
 
