@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 		siteName: "FarmPlace Africa",
 		images: [
 			{
-				url: "URL_TO_IMAGE", // Replace with actual URL of your image
+				url: "URL_TO_IMAGE",
 				width: 1200,
 				height: 630,
 				alt: "FarmPlace Africa",
