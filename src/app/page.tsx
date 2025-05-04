@@ -4,6 +4,7 @@ import KeyFeatures from "@/components/home/key-features";
 import Navbar from "@/components/layout/navigation";
 import OurVision from "@/components/home/vision";
 import AccountSetup from "@/components/home/account-setup";
+import Footer from "@/components/layout/footer";
 import React from "react";
 
 const Home = () => {
@@ -30,6 +31,7 @@ const Home = () => {
 			{/* Contact Us Section */}
 			{/* <ContactUs /> */}
 			{/* Footer Section */}
+			<Footer />
 		</React.Fragment>
 	);
 };
