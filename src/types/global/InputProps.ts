@@ -11,6 +11,7 @@ export type InputProps = {
 	 * @note this is optional
 	 */
 	label?: string;
+	icon?: JSX.Element;
 	/**
 	 * The placeholder text for the input.
 	 * @example "Enter your email address"

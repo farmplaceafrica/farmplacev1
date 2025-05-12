@@ -4,6 +4,7 @@
 /* eslint-disable tailwindcss/classnames-order */
 /* eslint-disable tailwindcss/no-custom-classname */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
 import Icons from "@/components/icons";
 import { cn } from "@/lib/utils";
 import type { InputProps } from "@/types/global/InputProps";
@@ -34,6 +35,7 @@ const Input = ({
 	onChange = () => {},
 	max,
 	min,
+	icon,
 	pattern,
 	rules = [],
 	name,
@@ -171,19 +173,19 @@ const Input = ({
 					message:
 						errorMessage ||
 						`The ${label} field doesn't satisfy the regex ${pattern}`,
-				}
+			  }
 			: undefined,
 		min: min
 			? {
 					value: min,
 					message: `The ${label} field must be greater than or equal to ${min}`,
-				}
+			  }
 			: undefined,
 		max: max
 			? {
 					value: max,
 					message: `The ${label} field must be less than or equal to ${max}`,
-				}
+			  }
 			: undefined,
 	});
 
@@ -280,6 +282,11 @@ const Input = ({
 				</span>
 			)}
 			<input
+				{...(icon && (
+					<div className='absolute left-3 top-1/2 transform -translate-y-1/2 z-10'>
+						{icon}
+					</div>
+				))}
 				onFocus={() => setPasswordIsDirty(true)}
 				{...register}
 				className={`w-full active:border-primary text-dark ${inputTheme(
