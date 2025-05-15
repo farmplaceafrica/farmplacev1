@@ -96,7 +96,7 @@ import Button from "@/components/global/Button";
 const navLinks = [
 	{ label: "Home", href: "#", active: true },
 	{ label: "About Us", href: "#about" },
-	{ label: "Market Place", href: "#market" },
+	{ label: "Market Place", href: "/dashboard/marketplace" },
 	{ label: "Resources", href: "#resources" },
 ];
 

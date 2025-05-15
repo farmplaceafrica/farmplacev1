@@ -32,7 +32,7 @@ const Button: React.FC<ButtonProps> = ({
 	const buttonTheme = (theme: string) => {
 		switch (theme) {
 			case "primary":
-				return "bg-[#4CAF50] disabled:opacity-50 text-white cursor-pointer rounded";
+				return "bg-green-800 disabled:opacity-50 text-white cursor-pointer rounded";
 			case "plain":
 				return ``;
 			case "outline":
