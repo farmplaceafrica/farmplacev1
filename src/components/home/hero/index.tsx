@@ -20,17 +20,6 @@ const Hero = () => {
 					<Button className='mt-8' size='lg' theme='primary'>
 						Get Started
 					</Button>
-
-					<div className='mt-12 w-full max-w-4xl'>
-						<Image
-							src='/assets/images/hero-bg.png'
-							alt='Hero Image'
-							width={848}
-							height={388}
-							className='w-full h-auto'
-							priority
-						/>
-					</div>
 				</div>
 			</div>
 		</section>
