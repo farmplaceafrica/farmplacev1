@@ -3,7 +3,6 @@ import { useWalletList } from "@meshsdk/react";
 import { useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import Button from "@/components/global/Button";
-import ConnectWallet from "@/components/global/CardanoWalletButton";
 
 const navLinks = [
 	{ label: "Home", href: "#", active: true },
@@ -61,9 +60,7 @@ const Navbar = () => {
 					<div className='hidden md:block'>
 						<Button className='w-[160px]'>Sign Up</Button>
 					</div>
-					<div className=''>
-						<ConnectWallet />
-					</div>
+
 					{/* <div>
 						{wallets.map((wallet, i) => {
 							return (

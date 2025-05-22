@@ -362,7 +362,7 @@ const ConnectWallet = () => {
 			{/* Main wallet button */}
 			<button
 				onClick={connected ? handleDisconnect : toggleDropdown}
-				className='px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center min-w-[160px]'>
+				className='px-4 py-2 bg-[#2A602C] cursor-pointer  text-white rounded-lg  transition-all duration-200 flex items-center justify-center min-w-[160px]'>
 				{connecting && (
 					<svg
 						className='animate-spin -ml-1 mr-2 h-4 w-4 text-white'
