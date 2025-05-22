@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, notFound } from "next/navigation";
-import ProductDetail from "@/components/dashboard/product-details";
+import ProductDetail from "@/components/marketplace/product-details";
 import { getProductById } from "@/data/productdata";
 import { CartProvider } from "@/components/context/CardContext";
 

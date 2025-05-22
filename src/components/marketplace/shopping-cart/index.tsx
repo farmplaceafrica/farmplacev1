@@ -26,11 +26,11 @@ const ShoppingCart = () => {
 	};
 
 	const handleCheckout = () => {
-		router.push("/dashboard/checkout");
+		router.push("/marketplace/checkout");
 	};
 
 	const handleContinueShopping = () => {
-		router.push("/dashboard/marketplace");
+		router.push("/marketplace");
 	};
 
 	if (cartItems.length === 0) {

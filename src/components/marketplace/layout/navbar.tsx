@@ -134,7 +134,7 @@ const DashboardNavbar = () => {
 		<FormProvider {...methods}>
 			<div className='w-full p-2 md:p-4 flex justify-between fixed mb-10 items-center shadow-sm bg-white z-10'>
 				{/* Logo */}
-				<Link href={"/dashboard/marketplace"} className='flex-shrink-0'>
+				<Link href={"/marketplace"} className='flex-shrink-0'>
 					<div className='flex items-center'>
 						<Image
 							src='/assets/images/logo.jpeg'
@@ -176,7 +176,7 @@ const DashboardNavbar = () => {
 
 				{/* Desktop: Icons */}
 				<div className='hidden md:flex gap-4'>
-					<Link href={"/dashboard/cart-view"} className='relative'>
+					<Link href={"/marketplace/cart-view"} className='relative'>
 						<ShoppingCart size={40} className='text-green-800' />
 						{cartItemCount > 0 && (
 							<span className='absolute top-0 right-0 bg-green-800 text-white text-xs rounded-full px-1'>
@@ -194,7 +194,7 @@ const DashboardNavbar = () => {
 
 				{/* Mobile: Icons (always visible) */}
 				<div className='hidden gap-2'>
-					<Link href={"/dashboard/cart-view"} className='relative'>
+					<Link href={"/marketplace/cart-view"} className='relative'>
 						<ShoppingCart size={28} className='text-green-800' />
 						{cartItemCount > 0 && (
 							<span className='absolute -top-1 -right-1 bg-green-800 text-white text-xs rounded-full px-1 min-w-[18px] h-[18px] flex items-center justify-center'>
@@ -230,7 +230,7 @@ const DashboardNavbar = () => {
 					</div>
 					<div className='flex flex-col gap-2'>
 						<Link
-							href='/dashboard/marketplace'
+							href='/marketplace'
 							className='flex items-center gap-2 p-2 hover:bg-gray-100 rounded'
 							onClick={() => setIsMenuOpen(false)}>
 							<ShoppingCart size={18} className='text-green-800' />

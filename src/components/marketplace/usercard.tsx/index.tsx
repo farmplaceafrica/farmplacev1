@@ -29,7 +29,7 @@ const ProductCard = ({
 
 	const handleViewDetails = () => {
 		// Navigate to the product detail page
-		router.push(`/dashboard/product-view/${id}`);
+		router.push(`/marketplace/product-view/${id}`);
 	};
 
 	const handleAddToCart = (e: React.MouseEvent) => {

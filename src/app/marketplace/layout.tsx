@@ -1,4 +1,4 @@
-import DashboardNavbar from "@/components/dashboard/layout/navbar";
+import DashboardNavbar from "@/components/marketplace/layout/navbar";
 import { Toaster } from "react-hot-toast";
 import { CartProvider } from "@/components/context/CardContext";
 const MarketplaceLayout = ({ children }: { children: React.ReactNode }) => {

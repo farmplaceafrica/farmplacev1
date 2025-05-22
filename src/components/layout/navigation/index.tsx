@@ -8,7 +8,7 @@ import ConnectWallet from "@/components/global/CardanoWalletButton";
 const navLinks = [
 	{ label: "Home", href: "#", active: true },
 	{ label: "About Us", href: "#about" },
-	{ label: "Market Place", href: "/dashboard/marketplace" },
+	{ label: "Market Place", href: "/marketplace" },
 	{ label: "Resources", href: "#resources" },
 ];
 

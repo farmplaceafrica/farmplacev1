@@ -382,7 +382,7 @@ const ProductDetail = ({ product }: { product: ProductDetailProps }) => {
 
 		// Navigate to cart page
 		setTimeout(() => {
-			router.push("/dashboard/cart-view");
+			router.push("/marketplace/cart-view");
 		}, 600);
 	};
 

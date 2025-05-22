@@ -1,6 +1,6 @@
 "use client";
 
-import ShoppingCart from "@/components/dashboard/shopping-cart";
+import ShoppingCart from "@/components/marketplace/shopping-cart";
 import { CartProvider } from "@/components/context/CardContext";
 export default function CartPage() {
 	return (
