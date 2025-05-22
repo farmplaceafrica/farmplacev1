@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { MapPin } from "lucide-react";
 
 interface ProductCardProps {
 	id: string;
@@ -55,7 +56,7 @@ const ProductCard = ({
 
 	return (
 		<div
-			className='bg-white w-full max-w-[350px] space-y-3 shadow-md border border-[#C9E7CB] p-4 m-2 rounded-3xl cursor-pointer'
+			className='bg-white w-full max-w-[350px]  shadow-md border border-[#C9E7CB] p-4 m-2 rounded-3xl cursor-pointer'
 			onClick={handleViewDetails}>
 			<div className='w-full h-48 relative'>
 				<Image
@@ -67,18 +68,23 @@ const ProductCard = ({
 				/>
 			</div>
 			<div>
-				<h2 className='text-2xl font-bold'>{title}</h2>
-				<p className='text-[#333333]'>{description}</p>
-				<p className='text-[#606060]'>{location}</p>
-			</div>
-			<div className='flex justify-between items-center'>
-				<h2 className='text-xl font-semibold'>{price}</h2>
-				{token && <h2 className='text-xl font-semibold'>{token}</h2>}
+				<h2 className='text-lg font-bold text-[#606060]'>{title}</h2>
+				<div className='flex text-[#4CAF50] text-[16px] mb-3 justify-between items-center'>
+					<h2 className='font-semibold'>{price}</h2>
+					{token && <h2 className=' font-semibold'>{token}</h2>}
+				</div>
+				<p className='text-[#777777] text-xs'>{description}</p>
+
+				<p className='text-[#606060] flex text-xs items-center'>
+					{" "}
+					<MapPin size={14} className='mr-1' />
+					{location}
+				</p>
 			</div>
 
 			<button
 				onClick={handleAddToCart}
-				className='w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-xl font-medium transition-colors'>
+				className='w-full  mt-5  bg-green-700 hover:bg-[#4CAF50] text-lg  cursor-pointer text-white py-2 px-4 rounded-xl font-medium transition-colors'>
 				Add to cart
 			</button>
 		</div>
