@@ -67,7 +67,7 @@ const Checkout = () => {
 	};
 
 	const handleBack = () => {
-		router.push("/dashboard/cart-view");
+		router.push("/marketplace/cart-view");
 	};
 
 	const handleNextStep = () => {

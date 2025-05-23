@@ -9,27 +9,28 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
-		"@meshsdk/react": "^1.9.0-beta.47",
-		"@privy-io/react-auth": "^2.9.1",
+		"@meshsdk/react": "1.9.0-beta.49",
+		"@privy-io/react-auth": "^2.13.2",
 		"@solana/spl-token": "^0.1.8",
 		"@svgr/webpack": "^8.1.0",
 		"clsx": "^2.1.1",
 		"lucide-react": "^0.487.0",
 		"next": "15.2.4",
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0",
-		"react-hook-form": "^7.55.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"react-hook-form": "^7.56.4",
 		"react-hot-toast": "^2.5.2",
 		"react-spinners": "^0.15.0",
-		"tailwind-merge": "^3.2.0",
+		"recharts": "^2.15.3",
+		"tailwind-merge": "^3.3.0",
 		"tailwindcss-animate": "^1.0.7"
 	},
 	"devDependencies": {
-		"@tailwindcss/postcss": "^4",
-		"@types/node": "^20",
-		"@types/react": "^19",
-		"@types/react-dom": "^19",
-		"tailwindcss": "^4",
-		"typescript": "^5"
+		"@tailwindcss/postcss": "^4.1.7",
+		"@types/node": "^20.17.50",
+		"@types/react": "^19.1.5",
+		"@types/react-dom": "^19.1.5",
+		"tailwindcss": "^4.1.7",
+		"typescript": "^5.8.3"
 	}
 }

@@ -1,29 +1,37 @@
-import DashboardNavbar from "@/components/dashboard/layout/navbar";
-import { Toaster } from "react-hot-toast";
-import { CartProvider } from "@/components/context/CardContext";
-const MarketplaceLayout = ({ children }: { children: React.ReactNode }) => {
+"use client";
+
+import React, { useState } from "react";
+import Sidebar from "@/components/dashboard/sidenav";
+import TopNavigation from "@/components/dashboard/topnav";
+
+export default function DashboardLayout({
+	children,
+}: {
+	children: React.ReactNode;
+}) {
+	const [sidebarOpen, setSidebarOpen] = useState(false);
+
+	const handleMenuClick = () => {
+		setSidebarOpen(true);
+	};
+
+	const handleSidebarClose = () => {
+		setSidebarOpen(false);
+	};
+
 	return (
-		<CartProvider>
-			<div className='flex flex-col'>
-				{/* Toast Notifications */}
-				<Toaster
-					position='top-right'
-					reverseOrder={false}
-					toastOptions={{
-						className: "",
-						duration: 5000,
-						style: {
-							background: "#363636",
-							color: "#fff",
-						},
-					}}
-				/>
-				{/* Dashboard Navbar */}
-				<DashboardNavbar />
-				{/* Main Content */}
-				<div className='flex flex-col mt-20'>{children}</div>
+		<div className='min-h-screen flex bg-gray-50'>
+			{/* Sidebar */}
+			<Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose} />
+
+			{/* Main Content */}
+			<div className=' w-full ml-0 lg:ml-64'>
+				{/* Top Navigation */}
+				<TopNavigation onMenuClick={handleMenuClick} />
+
+				{/* Page Content */}
+				<main className='p-4 lg:p-6'>{children}</main>
 			</div>
-		</CartProvider>
+		</div>
 	);
-};
-export default MarketplaceLayout;
+}

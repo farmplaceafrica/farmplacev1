@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import ProductsGrid from "@/components/dashboard/product-grid";
+import ProductsGrid from "@/components/marketplace/product-grid";
 import productsData from "@/data/productdata";
 import { CartProvider } from "@/components/context/CardContext";
 
