@@ -12,6 +12,7 @@ import {
 
 import ResourcesSection from "@/components/dashboard/resources";
 import FarmHeroSection from "@/components/dashboard/farmer-hero";
+import Analytics from "@/components/dashboard/analyitics";
 
 // Analytics Chart Component
 
@@ -82,7 +83,7 @@ const FarmerDashboard = () => {
 						<p className='text-sm text-gray-600'>Market Share</p>
 					</div>
 				</div>
-
+				{/* <Analytizcs /> */}
 				{/* Resources Section */}
 				<ResourcesSection />
 			</div>
