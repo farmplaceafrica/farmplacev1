@@ -1,5 +1,5 @@
 "use client";
-import { useWalletList } from "@meshsdk/react";
+import Link from "next/link";
 import { useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import Button from "@/components/global/Button";
@@ -58,7 +58,9 @@ const Navbar = () => {
 				<div className='flex items-center gap-4'>
 					{/* Sign Up Button */}
 					<div className='hidden md:block'>
-						<Button className='w-[160px]'>Sign Up</Button>
+						<Link href={"/auth/register/1"}>
+							<Button className='w-[160px]'>Sign Up</Button>
+						</Link>
 					</div>
 
 					{/* <div>
@@ -73,33 +75,6 @@ const Navbar = () => {
 					</div> */}
 
 					{/* Dropdown */}
-					<div className='relative hidden md:block'>
-						<button
-							onClick={toggleDropdown}
-							className='flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md'>
-							<span role='img' aria-label={selectedCountry.name}>
-								{selectedCountry.flag}
-							</span>
-							<span className='text-gray-800'>{selectedCountry.name}</span>
-							<ChevronDown size={16} />
-						</button>
-
-						{isDropdownOpen && (
-							<div className='absolute top-full mt-2 w-40 bg-white border-[#4CAF50] border overflow-hidden rounded-md shadow-lg z-10'>
-								<ul>
-									{countries.map((country) => (
-										<li
-											key={country.name}
-											onClick={() => handleSelectCountry(country)}
-											className='px-4 text-black py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2'>
-											<span>{country.flag}</span>
-											<span>{country.name}</span>
-										</li>
-									))}
-								</ul>
-							</div>
-						)}
-					</div>
 
 					{/* Mobile menu toggle */}
 					<button className='md:hidden' onClick={toggleMobileMenu}>
