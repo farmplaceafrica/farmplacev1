@@ -13,11 +13,11 @@ const ResourceCard = ({
 	image,
 }: ResourceCardProps) => (
 	<div className='bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300'>
-		<div className='h-48 overflow-hidden'>
+		<div className='h-48 p-4  '>
 			<img
 				src={image}
 				alt={title}
-				className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
+				className='w-full h-full object-cover rounded-lg  hover:scale-105 transition-transform duration-300'
 			/>
 		</div>
 		<div className='p-4'>
