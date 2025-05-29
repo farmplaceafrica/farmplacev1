@@ -84,7 +84,7 @@ const ProductCard = ({
 
 			<button
 				onClick={handleAddToCart}
-				className='w-full  mt-5  bg-green-700 hover:bg-[#4CAF50] text-lg  cursor-pointer text-white py-2 px-4 rounded-xl font-medium transition-colors'>
+				className='w-full  mt-5  bg-green-900 hover:bg-[#468149] text-lg  cursor-pointer text-white py-2 px-4 rounded-xl font-medium transition-colors'>
 				Add to cart
 			</button>
 		</div>

@@ -195,7 +195,7 @@ const WALLET_DOWNLOAD_URLS = {
 	lace: "https://www.lace.io",
 };
 
-const ConnectWallet = () => {
+const ConnectWallet = ({ className }: { className?: string }) => {
 	const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
 	const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 	const { connect, disconnect, connecting, connected, wallet } = useWallet();
@@ -362,7 +362,7 @@ const ConnectWallet = () => {
 			{/* Main wallet button */}
 			<button
 				onClick={connected ? handleDisconnect : toggleDropdown}
-				className='px-4 py-2 bg-[#2A602C] cursor-pointer  text-white rounded-lg  transition-all duration-200 flex items-center justify-center min-w-[160px]'>
+				className={`px-4 py-2 bg-[#2A602C] cursor-pointer  text-white rounded-lg  transition-all duration-200 flex items-center justify-center ${className}`}>
 				{connecting && (
 					<svg
 						className='animate-spin -ml-1 mr-2 h-4 w-4 text-white'

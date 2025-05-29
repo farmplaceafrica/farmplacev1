@@ -1,214 +1,87 @@
-// // AccountSetup.tsx
-// "use client";
-
-// import { useState } from "react";
-// import Image from "next/image";
-
-// interface StepProps {
-
-// }
-
-// const Step: React.FC<StepProps> = ({
-
-// }) => {
-// 	return (
-// 		<div className='flex flex-col items-center w-full max-w-sm'>
-// 			<div
-// 				className={`flex items-center justify-center w-12 h-12 rounded-full border-2 mb-4 ${
-// 					isCompleted
-// 						? "bg-green-500 border-green-500 text-white"
-// 						: isActive
-// 						? "border-blue-500 text-blue-500"
-// 						: "border-gray-300 text-gray-400"
-// 				}`}>
-// 				{isCompleted ? (
-// 					<svg
-// 						className='w-6 h-6'
-// 						fill='none'
-// 						stroke='currentColor'
-// 						viewBox='0 0 24 24'
-// 						xmlns='http://www.w3.org/2000/svg'>
-// 						<path
-// 							strokeLinecap='round'
-// 							strokeLinejoin='round'
-// 							strokeWidth={2}
-// 							d='M5 13l4 4L19 7'
-// 						/>
-// 					</svg>
-// 				) : (
-// 					<span className='text-lg font-semibold'>{number}</span>
-// 				)}
-// 			</div>
-// 			<h3
-// 				className={`text-lg font-semibold mb-2 ${
-// 					isActive ? "text-blue-600" : "text-gray-800"
-// 				}`}>
-// 				{title}
-// 			</h3>
-// 			<p className='text-gray-600 text-center'>{description}</p>
-// 		</div>
-// 	);
-// };
-
-// const AccountSetup = () => {
-// 	const [currentStep, setCurrentStep] = useState(1);
-
-// 	const steps = [
-// 		{
-// 			number: 1,
-// 			title: "Click on Get Started",
-// 			description:
-// 				'Begin your journey by clicking the "Get Started" button to initiate the account creation process.',
-// 		},
-// 		{
-// 			number: 2,
-// 			title: "Sign up with email or Google",
-// 			description:
-// 				"Choose your preferred signup method using your email address, Google account, or connect your digital wallet.",
-// 		},
-// 		{
-// 			number: 3,
-// 			title: "Add your ID to confirm identity",
-// 			description:
-// 				"Complete the verification process by providing your identification to secure your account and access all features.",
-// 		},
-// 	];
-
-// 	return (
-// 		<div className='bg-gray-50 min-h-screen flex flex-col items-center py-12 px-4'>
-// 			<div className='max-w-4xl w-full bg-white rounded-lg shadow-lg p-8'>
-// 				<h1 className='text-3xl font-bold text-gray-800 mb-8 text-center'>
-// 					Setup your account in just few minutes
-// 				</h1>
-
-// 				<div className='flex flex-col md:flex-row justify-between items-start md:items-center mb-12'>
-// 					{steps.map((step, index) => (
-// 						<div
-// 							key={step.number}
-// 							className='flex flex-col items-center w-full'>
-// 							<Step
-// 								number={step.number}
-// 								title={step.title}
-// 								description={step.description}
-// 								isActive={currentStep === step.number}
-// 								isCompleted={currentStep > step.number}
-// 							/>
-
-// 							{index < steps.length - 1 && (
-// 								<div className='hidden md:block w-full h-0.5 bg-gray-200 mt-6'>
-// 									<div
-// 										className='h-full bg-blue-500'
-// 										style={{ width: currentStep > index + 1 ? "100%" : "0%" }}
-// 									/>
-// 								</div>
-// 							)}
-// 						</div>
-// 					))}
-// 				</div>
-
-// 				<div className='flex justify-center mt-8'>
-// 					{currentStep > 1 && (
-// 						<button
-// 							className='px-6 py-2 mr-4 border border-blue-500 text-blue-500 rounded-md hover:bg-blue-50 transition-colors'
-// 							onClick={() => setCurrentStep((prev) => Math.max(1, prev - 1))}>
-// 							Back
-// 						</button>
-// 					)}
-
-// 			</div>
-// 		</div>
-// 	);
-// };
-
-// export default AccountSetup;
-
-// AccountSetupSteps.tsx
 import React from "react";
-import Image from "next/image";
 
-const AccountSetupSteps = () => {
+const AccountSetup = () => {
+	const steps = [
+		{
+			number: 1,
+			title: "Click on Get started",
+			description:
+				"Begin your journey by clicking the Get Started button to initiate the account creation process.",
+		},
+		{
+			number: 2,
+			title: "Sign up with email or google or connect wallet",
+			description:
+				"Choose your preferred method to create an account - use your email, Google account, or connect your existing wallet.",
+		},
+		{
+			number: 3,
+			title: "Add you ID to confirm identity",
+			description:
+				"Complete the verification process by uploading your identification documents to confirm your identity.",
+		},
+	];
+
 	return (
-		<div className='w-full max-w-6xl mx-auto px-4 py-8'>
-			<div className='flex justify-center mb-12'>
-				<div className='relative w-full max-w-md'>
-					<Image
-						src='/assets/images/BG.png'
-						alt='Account setup illustration'
-						width={600}
-						height={400}
-						className='rounded-lg'
-					/>
-				</div>
-			</div>
-			{/* Step indicators with connecting lines */}
-			<div className='flex items-center justify-between mb-12'>
-				<div className='flex items-center w-full'>
-					{/* Step 1 */}
-					<div className='flex flex-col items-center'>
-						<div className='w-14 h-14 rounded-full border-2 border-blue-500 flex items-center justify-center text-blue-500 font-semibold text-xl'>
-							1
+		<div className='p-4 md:p-8'>
+			<div className='max-w-7xl mx-auto bg-[#F9DCAD] rounded-4xl'>
+				<div className='p-8 md:p-12 lg:p-16'>
+					{/* Header */}
+					<div className='mb-16 md:mb-24'>
+						<h1 className='text-4xl md:text-5xl lg:text-6xl font-bold text-green-800 leading-tight'>
+							Setup your account in just
+							<br />
+							few steps
+						</h1>
+					</div>
+
+					{/* Steps Container */}
+					<div className='relative mb-16 md:mb-24'>
+						{/* Progress Line - Desktop only */}
+						<div
+							className='hidden lg:block absolute top-8 left-8 right-8 h-px bg-green-700'
+							style={{ width: "calc(100% - 4rem)" }}></div>
+
+						{/* Steps */}
+						<div className='grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-8'>
+							{steps.map((step, index) => (
+								<div key={step.number} className='relative'>
+									{/* Step Number Circle */}
+									<div className='w-16 h-16 bg-green-700 rounded-full flex items-center justify-center mb-8 relative z-10'>
+										<span className='text-white font-bold text-xl'>
+											{step.number}
+										</span>
+									</div>
+
+									{/* Mobile connecting line */}
+									{index < steps.length - 1 && (
+										<div className='lg:hidden absolute left-8 top-16 w-px h-12 bg-green-700'></div>
+									)}
+
+									{/* Content */}
+									<div className='max-w-md'>
+										<h3 className='text-xl md:text-2xl font-bold text-green-800 mb-4 leading-tight'>
+											{step.title}
+										</h3>
+										<p className='text-gray-700 text-base md:text-lg leading-relaxed'>
+											{step.description}
+										</p>
+									</div>
+								</div>
+							))}
 						</div>
 					</div>
 
-					{/* Line between 1 and 2 */}
-					<div className='flex-1 h-0.5 bg-blue-500'></div>
-
-					{/* Step 2 */}
-					<div className='flex flex-col items-center'>
-						<div className='w-14 h-14 rounded-full border-2 border-blue-500 flex items-center justify-center text-blue-500 font-semibold text-xl'>
-							2
-						</div>
+					{/* Get Started Button */}
+					<div className='flex justify-center lg:justify-end'>
+						<button className='bg-green-700 hover:bg-green-800 text-white font-semibold px-12 py-4 rounded-full transition-colors duration-200 text-lg shadow-lg'>
+							Get Started
+						</button>
 					</div>
-
-					{/* Line between 2 and 3 */}
-					<div className='flex-1 h-0.5 bg-blue-500'></div>
-
-					{/* Step 3 */}
-					<div className='flex flex-col items-center'>
-						<div className='w-14 h-14 rounded-full border-2 border-blue-500 flex items-center justify-center text-blue-500 font-semibold text-xl'>
-							3
-						</div>
-					</div>
-				</div>
-			</div>
-
-			{/* Step content */}
-			<div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-				{/* Step 1 content */}
-				<div>
-					<h3 className='text-2xl font-bold text-gray-800 mb-4'>
-						Click on Get started
-					</h3>
-					<p className='text-gray-600'>
-						Lorem ipsum dolor sit amet consectetur. Molestie vulputate lobortis
-						id eu nisi est.
-					</p>
-				</div>
-
-				{/* Step 2 content */}
-				<div>
-					<h3 className='text-2xl font-bold text-gray-800 mb-4'>
-						Sign up with email or google or connect wallet
-					</h3>
-					<p className='text-gray-600'>
-						Lorem ipsum dolor sit amet consectetur. Molestie vulputate lobortis
-						id eu nisi est.
-					</p>
-				</div>
-
-				{/* Step 3 content */}
-				<div>
-					<h3 className='text-2xl font-bold text-gray-800 mb-4'>
-						Add you ID to confirm identity
-					</h3>
-					<p className='text-gray-600'>
-						Lorem ipsum dolor sit amet consectetur. Molestie vulputate lobortis
-						id eu nisi est.
-					</p>
 				</div>
 			</div>
 		</div>
 	);
 };
 
-export default AccountSetupSteps;
+export default AccountSetup;

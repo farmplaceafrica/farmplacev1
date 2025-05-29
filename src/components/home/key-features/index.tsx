@@ -43,7 +43,9 @@ const KeyFeatures = () => {
 				</p>
 				<div className='grid grid-cols-1 md:grid-cols-2  gap-8 mt-8'>
 					{Features.map((feature, index) => (
-						<div key={index} className='w-[320px] '>
+						<div
+							key={index}
+							className='w-[350px] border border-[#4CAF50] rounded-2xl p-5 '>
 							<div className='mb-2'>{feature.image}</div>
 							<h3 className='text-2xl font-bold text-gray-800'>
 								{feature.title}

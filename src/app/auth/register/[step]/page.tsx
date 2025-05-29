@@ -439,6 +439,7 @@
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import ConnectWallet from "@/components/global/CardanoWalletButton";
 
 interface FormData {
 	fullName: string;
@@ -791,7 +792,8 @@ const RegisterPage = () => {
 				<label className='block text-sm font-medium text-gray-700 mb-2'>
 					Connect Wallet
 				</label>
-				<select
+				<ConnectWallet className='w-[380px] bg-white !text-black border' />
+				{/* <select
 					value={formData.wallet}
 					onChange={(e) => updateFormData("wallet", e.target.value)}
 					className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent'>
@@ -800,7 +802,7 @@ const RegisterPage = () => {
 					<option value='ccvault'>CCVault</option>
 					<option value='yoroi'>Yoroi</option>
 					<option value='flint'>Flint</option>
-				</select>
+				</select> */}
 			</div>
 
 			<button
@@ -850,7 +852,7 @@ const RegisterPage = () => {
 			<div className='max-w-md w-full'>
 				{renderStepIndicator()}
 
-				<div className='bg-white rounded-lg shadow-lg p-8 border-2 border-blue-500'>
+				<div className='bg-white rounded-lg shadow-md p-8 '>
 					<div className='text-center mb-8'>
 						<h1 className='text-2xl font-bold text-gray-900 mb-2'>
 							Create Account

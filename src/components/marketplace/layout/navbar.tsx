@@ -74,7 +74,7 @@ const DashboardNavbar = () => {
 
 	return (
 		<FormProvider {...methods}>
-			<div className='w-full p-2 md:p-4 flex justify-between fixed mb-10 items-center shadow-sm bg-white z-10'>
+			<div className='w-full p-2 md:p-4 flex justify-between fixed  items-center shadow-sm bg-white z-10'>
 				{/* Logo */}
 				<Link href={"/marketplace"} className='flex-shrink-0'>
 					<div className='flex items-center'>
