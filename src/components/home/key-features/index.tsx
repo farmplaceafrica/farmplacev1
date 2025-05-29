@@ -38,12 +38,14 @@ const KeyFeatures = () => {
 		<div className='bg-[#EDF6ED]'>
 			<div className='flex flex-col items-center justify-center py-10'>
 				<h2 className='text-3xl font-bold text-gray-800'>Key Features</h2>
-				<p className='mt-4 text-gray-600'>
+				<p className='mt-4 text-center text-gray-600'>
 					Explore the key features that make our platform unique and powerful.
 				</p>
 				<div className='grid grid-cols-1 md:grid-cols-2  gap-8 mt-8'>
 					{Features.map((feature, index) => (
-						<div key={index} className='w-[320px] '>
+						<div
+							key={index}
+							className='w-[350px] border border-[#4CAF50] rounded-2xl p-5 '>
 							<div className='mb-2'>{feature.image}</div>
 							<h3 className='text-2xl font-bold text-gray-800'>
 								{feature.title}
