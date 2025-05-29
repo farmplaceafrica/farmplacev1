@@ -7,7 +7,7 @@ const Hero = () => {
 		<>
 			{/* <div className='bg-[#4A7C59] relative overflow-hidden rounded-3xl mx-4 my-8 h-[690px]'> */}
 			{/* Main Hero Section */}
-			<div className='container  px-8 my-5 py-20 bg-[#2A602C] relative mx-auto overflow-hidden rounded-3xl h-[690px] flex items-center justify-center'>
+			<div className='container  px-8 mt-20 py-20 bg-[#2A602C] relative mx-auto overflow-hidden rounded-3xl h-[690px] flex items-center justify-center'>
 				<div className='flex flex-col items-center justify-center text-center max-w-4xl mx-auto relative z-10'>
 					<h1 className='text-4xl md:text-5xl lg:text-6xl text-white font-bold leading-tight mb-4'>
 						Empowering African farmers through technology.
