@@ -13,14 +13,17 @@ const Home = () => {
 	return (
 		<React.Fragment>
 			<Navbar />
-			<Hero />
-			<TargetAudience />
-			<KeyFeatures />
-			<FeaturedProducts />
-			<AccountSetup />
-			<CardanoSection />
-			<FAQAndCTA />
-			<Footer />
+			<div className='p-3 md:p-0'>
+				{/* Main Content */}
+				<Hero />
+				<TargetAudience />
+				<KeyFeatures />
+				<FeaturedProducts />
+				<AccountSetup />
+				<CardanoSection />
+				<FAQAndCTA />
+				<Footer />
+			</div>
 		</React.Fragment>
 	);
 };

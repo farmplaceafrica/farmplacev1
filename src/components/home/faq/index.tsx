@@ -84,7 +84,7 @@ const FarmPlaceCTA = () => {
 		<div className='max-w-6xl mx-auto px-4 py-8'>
 			<div className='relative bg-[#2A602C] rounded-3xl overflow-hidden'>
 				{/* Background decorative elements */}
-				<div className='absolute top-0 left-0 w-32 h-32 '>
+				<div className='hidden lg:block absolute top-0 left-0 w-32 h-32 '>
 					<Image
 						src='/assets/images/clover1.png'
 						alt='Fresh cherry tomatoes on vine'
@@ -94,7 +94,7 @@ const FarmPlaceCTA = () => {
 					/>
 				</div>
 
-				<div className='absolute bottom-0 right-0 w-40 h-40 '>
+				<div className='hidden lg:block absolute bottom-0 right-0 w-40 h-40 '>
 					<Image
 						src='/assets/images/clover2.png'
 						alt='Fresh cherry tomatoes on vine'
