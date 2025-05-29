@@ -141,7 +141,7 @@ const FarmPlaceCTA = () => {
 // Main component combining both
 const FAQAndCTA = () => {
 	return (
-		<div className='bg-gray-50 min-h-screen'>
+		<div className='bg-gray-50'>
 			<FAQAccordion />
 			<FarmPlaceCTA />
 		</div>

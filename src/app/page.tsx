@@ -7,6 +7,7 @@ import AccountSetup from "@/components/home/account-setup";
 import Footer from "@/components/layout/footer";
 import React from "react";
 import FeaturedProducts from "@/components/home/featured-product";
+import CardanoSection from "@/components/home/cardano-ads";
 
 const Home = () => {
 	return (
@@ -17,7 +18,7 @@ const Home = () => {
 			<KeyFeatures />
 			<FeaturedProducts />
 			<AccountSetup />
-
+			<CardanoSection />
 			<FAQAndCTA />
 			<Footer />
 		</React.Fragment>
