@@ -7,13 +7,24 @@ const Hero = () => {
 		<>
 			{/* <div className='bg-[#4A7C59] relative overflow-hidden rounded-3xl mx-4 my-8 h-[690px]'> */}
 			{/* Main Hero Section */}
-			<div className='container  px-8 mt-20 py-20 bg-[#2A602C] relative mx-auto overflow-hidden rounded-3xl h-[690px] flex items-center justify-center'>
+
+			<div className='container px-8 py-20 mt-20 relative mx-auto overflow-hidden rounded-3xl h-[690px] flex items-center justify-center'>
+				{/* For Mobile */}
+				<div
+					className='absolute inset-0 lg:hidden bg-cover bg-center'
+					style={{
+						backgroundImage: `url("/assets/images/cardanobanner.png")`,
+					}}></div>
+
+				{/* For Desktop */}
+				<div className='hidden lg:block absolute inset-0 bg-[#2A602C]'></div>
+
 				<div className='flex flex-col items-center justify-center text-center max-w-4xl mx-auto relative z-10'>
-					<h1 className='text-4xl md:text-5xl lg:text-6xl text-white font-bold leading-tight mb-4'>
+					<h1 className='text-3xl md:text-5xl lg:text-6xl text-white font-bold leading-tight mb-4'>
 						Empowering African farmers through technology.
 					</h1>
 
-					<p className='text-lg md:text-xl text-white/90 max-w-2xl leading-relaxed mb-8'>
+					<p className='text-sm md:text-xl text-white/90 max-w-2xl leading-relaxed mb-8'>
 						FarmPlace is a digital platform that empowers African farmers to
 						create their own online marketplace by building digital profiles,
 						listing products, and connecting directly with buyers.
@@ -24,8 +35,7 @@ const Hero = () => {
 					</Button>
 				</div>
 
-				{/* Positioned Images - maintaining their natural shapes */}
-				{/* Top Left - Cherry Tomatoes (organic blob shape) */}
+				{/* Positioned Images - Hidden on Mobile */}
 				<div className='hidden lg:block absolute top-0 left-0 z-20'>
 					<Image
 						src='/assets/images/landtomato.png'
@@ -36,7 +46,6 @@ const Hero = () => {
 					/>
 				</div>
 
-				{/* Bottom Left - Farmer in Field (circular) */}
 				<div className='hidden lg:block absolute bottom-0 left-0 z-20'>
 					<Image
 						src='/assets/images/landfarmer.png'
@@ -47,7 +56,6 @@ const Hero = () => {
 					/>
 				</div>
 
-				{/* Top Right - Cabbage (organic shape) */}
 				<div className='hidden lg:block absolute top-0 right-0 z-20'>
 					<Image
 						src='/assets/images/landcabbage.png'
@@ -58,6 +66,7 @@ const Hero = () => {
 					/>
 				</div>
 			</div>
+
 			{/* </div> */}
 
 			{/* Stats Section */}

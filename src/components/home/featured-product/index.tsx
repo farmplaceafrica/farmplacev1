@@ -80,7 +80,7 @@ const FeaturedProducts = () => {
 					<div className='text-center'>
 						<button
 							onClick={handleGoToMarketplace}
-							className='bg-green-900 flex hover:bg-green-700 text-white font-semibold px-8 py-4 rounded-full transition-colors duration-200 text-lg shadow-lg'>
+							className='bg-green-900 flex w-full items-center justify-center lg:w-[300px] hover:bg-green-700 text-white font-semibold px-8 py-4 rounded-full transition-colors duration-200 text-lg shadow-lg'>
 							<ShoppingBasket className='mr-3' />
 							Go to Marketplace
 						</button>
