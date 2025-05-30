@@ -14,6 +14,7 @@ interface ProductFormData {
 	category: string;
 	description: string;
 	location: string;
+	quantity: number;
 	priceNGN: string;
 	mainImage: ProductImage | null;
 	additionalImages: ProductImage[];
@@ -79,6 +80,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 		description: initialData?.description || "",
 		location: initialData?.location || "Calabar",
 		priceNGN: initialData?.priceNGN || "",
+		quantity: initialData?.quantity || 1,
 		mainImage: initialData?.mainImage || null,
 		additionalImages: initialData?.additionalImages || [],
 	});
@@ -201,7 +203,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
 			showToast("error", "NGN price is required");
 			return false;
 		}
-
+		if (!formData.quantity || formData.quantity < 1) {
+			showToast("error", "Quantity must be at least 1");
+			return false;
+		}
 		if (!formData.mainImage) {
 			showToast("error", "Main product image is required");
 			return false;
@@ -352,7 +357,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 									<label className='block text-sm font-medium text-gray-700 mb-2'>
 										Price
 									</label>
-									<div className='grid grid-cols-2 gap-4'>
+									<div className=' gap-4'>
 										<input
 											type='text'
 											name='priceNGN'
@@ -363,6 +368,21 @@ const ProductForm: React.FC<ProductFormProps> = ({
 											required
 										/>
 									</div>
+								</div>
+								{/* Quantity */}
+								<div>
+									<label className='block text-sm font-medium text-gray-700 mb-2'>
+										Quantity
+									</label>
+									<input
+										type='number'
+										name='quantity'
+										value={formData.quantity}
+										onChange={handleInputChange}
+										min='1'
+										className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none'
+										required
+									/>
 								</div>
 							</div>
 
