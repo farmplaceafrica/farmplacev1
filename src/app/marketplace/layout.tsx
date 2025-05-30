@@ -23,7 +23,7 @@ const MarketplaceLayout = ({ children }: { children: React.ReactNode }) => {
 					{/* Dashboard Navbar */}
 					<DashboardNavbar />
 					{/* Main Content */}
-					<div className='flex flex-col mt-20'>{children}</div>
+					<div className='flex flex-col  '>{children}</div>
 				</div>
 			</CartProvider>
 		</SearchProvider>

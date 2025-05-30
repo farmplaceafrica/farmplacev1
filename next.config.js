@@ -43,6 +43,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 
+    images: {
+        // Option 1: Simple domain allowlist
+        domains: ['res.cloudinary.com'],
+
+        // Option 2: More specific pattern matching (recommended for production)
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'res.cloudinary.com',
+                port: '',
+                pathname: '/dgirhdnol/**', // Replace 'dgirhdnol' with your actual cloud name
+            },
+        ],
+    },
     webpack(config) {
         const fileLoaderRule = config.module.rules.find((rule) =>
             rule.test?.test?.(".svg")
