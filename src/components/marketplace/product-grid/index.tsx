@@ -10,7 +10,7 @@ interface Product {
 	title: string;
 	description: string;
 	location: string;
-	token?: string;
+	ada: string;
 	price: string;
 	image: string;
 }
@@ -125,8 +125,8 @@ const ProductsGrid = ({ products, title }: ProductsGridProps) => {
 									title={product.title}
 									description={product.description}
 									location={product.location}
-									token={product.token}
 									price={product.price}
+									ada={product.ada}
 									image={product.image}
 									onAddToCart={handleAddToCart}
 								/>

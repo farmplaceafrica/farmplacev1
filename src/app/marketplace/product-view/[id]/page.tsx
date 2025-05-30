@@ -1,79 +1,3 @@
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import { useParams, notFound } from "next/navigation";
-// import ProductDetail from "@/components/marketplace/product-details";
-// import { productService, Product } from "@/service/productService"; // Adjust import path
-// import { CartProvider } from "@/components/context/CardContext";
-
-// export default function ProductDetailPage() {
-// 	const { id } = useParams();
-// 	const [product, setProduct] = useState<Product | null>(null);
-// 	const [isLoading, setIsLoading] = useState(true);
-// 	const [error, setError] = useState<string | null>(null);
-
-// 	useEffect(() => {
-// 		const fetchProduct = async () => {
-// 			if (!id) {
-// 				setIsLoading(false);
-// 				return;
-// 			}
-
-// 			try {
-// 				const productId = Array.isArray(id) ? id[0] : id;
-// 				const fetchedProduct = await productService.getProductById(productId);
-
-// 				if (fetchedProduct) {
-// 					setProduct(fetchedProduct);
-// 				} else {
-// 					setError("Product not found");
-// 				}
-// 			} catch (err) {
-// 				console.error("Error fetching product:", err);
-// 				setError("Failed to load product");
-// 			} finally {
-// 				setIsLoading(false);
-// 			}
-// 		};
-
-// 		fetchProduct();
-// 	}, [id]);
-
-// 	if (isLoading) {
-// 		return (
-// 			<main className='min-h-screen flex items-center justify-center'>
-// 				<div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500'></div>
-// 			</main>
-// 		);
-// 	}
-
-// 	if (error || !product) {
-// 		return notFound();
-// 	}
-
-// 	// Transform product data to match your ProductDetail component's expected format
-// 	const transformedProduct = {
-// 		id: product._id,
-// 		title: product.productName,
-// 		description: product.description,
-// 		location: product.location,
-// 		price: product.priceNGN,
-// 		image: product.images[0] || "/placeholder-image.jpg",
-// 		images: product.images,
-// 		category: product.category,
-// 		quantity: product.quantity,
-// 		// Add any other fields your ProductDetail component expects
-// 	};
-
-// 	return (
-// 		<CartProvider>
-// 			<main className='min-h-screen py-6'>
-// 				<ProductDetail product={transformedProduct} />
-// 			</main>
-// 		</CartProvider>
-// 	);
-// }
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -133,6 +57,7 @@ export default function ProductDetailPage() {
 		title: product.productName,
 		description: product.description,
 		price: product.priceNGN,
+		price2: product.priceADA ?? 0, // Provide a default value if undefined
 		currency: "NGN",
 
 		// Required fields with default values

@@ -266,6 +266,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/context/CardContext";
+import Link from "next/link";
 
 const ShoppingCart = () => {
 	const { cartItems, updateQuantity, removeFromCart, clearCart } = useCart();
@@ -300,22 +301,6 @@ const ShoppingCart = () => {
 		return (
 			<div className='min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center px-4'>
 				<div className='bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-green-100 p-12 text-center max-w-lg mx-4 relative overflow-hidden'>
-					{/* Background Pattern */}
-					<div className='absolute inset-0 opacity-5'>
-						<svg className='w-full h-full' viewBox='0 0 100 100' fill='none'>
-							<defs>
-								<pattern
-									id='grain'
-									patternUnits='userSpaceOnUse'
-									width='20'
-									height='20'>
-									<circle cx='10' cy='10' r='1' fill='currentColor' />
-								</pattern>
-							</defs>
-							<rect width='100' height='100' fill='url(#grain)' />
-						</svg>
-					</div>
-
 					{/* Fresh Produce Icon */}
 					<div className='relative w-32 h-32 mx-auto mb-8 bg-gradient-to-br from-green-400 via-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-lg transform rotate-3'>
 						<div className='bg-white/20 backdrop-blur-sm rounded-full p-4'>
@@ -347,33 +332,35 @@ const ShoppingCart = () => {
 							🌱 Farm to table in 24 hours
 						</span>
 					</p>
-					<button
-						onClick={() => router.push("/marketplace")}
-						className='group bg-gradient-to-r from-green-600 via-emerald-600 to-green-700 text-white py-4 px-10 rounded-2xl font-semibold hover:from-green-700 hover:via-emerald-700 hover:to-green-800 transition-all duration-300 transform hover:scale-105 hover:shadow-xl shadow-lg'>
-						<span className='flex items-center justify-center gap-2'>
-							🛒 Start Shopping
-							<svg
-								className='w-5 h-5 transition-transform group-hover:translate-x-1'
-								fill='none'
-								stroke='currentColor'
-								viewBox='0 0 24 24'>
-								<path
-									strokeLinecap='round'
-									strokeLinejoin='round'
-									strokeWidth={2}
-									d='M17 8l4 4m0 0l-4 4m4-4H3'
-								/>
-							</svg>
-						</span>
-					</button>
+					<Link
+						href={"/marketplace"}
+						className='text-green-600  cursor-pointer underline mb-4'>
+						<button className='group bg-gradient-to-r from-green-600 via-emerald-600 to-green-700 text-white py-4 px-10 rounded-2xl font-semibold hover:from-green-700 hover:via-emerald-700 hover:to-green-800 transition-all duration-300 transform hover:scale-105 hover:shadow-xl shadow-lg'>
+							<span className='flex items-center justify-center gap-2'>
+								🛒 Start Shopping
+								<svg
+									className='w-5 h-5 transition-transform group-hover:translate-x-1'
+									fill='none'
+									stroke='currentColor'
+									viewBox='0 0 24 24'>
+									<path
+										strokeLinecap='round'
+										strokeLinejoin='round'
+										strokeWidth={2}
+										d='M17 8l4 4m0 0l-4 4m4-4H3'
+									/>
+								</svg>
+							</span>
+						</button>
+					</Link>
 				</div>
 			</div>
 		);
 	}
 
 	const subtotal = calculateSubtotal();
-	const shipping = 1000;
-	const total = subtotal + shipping;
+
+	const total = subtotal;
 
 	return (
 		<div className='min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50'>
@@ -660,26 +647,7 @@ const ShoppingCart = () => {
 										{formatPrice(subtotal.toString())}
 									</span>
 								</div>
-								<div className='flex justify-between py-3 border-b border-green-100'>
-									<div className='flex items-center gap-2'>
-										<svg
-											className='w-4 h-4 text-green-600'
-											fill='none'
-											stroke='currentColor'
-											viewBox='0 0 24 24'>
-											<path
-												strokeLinecap='round'
-												strokeLinejoin='round'
-												strokeWidth={2}
-												d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-											/>
-										</svg>
-										<span className='text-gray-600 font-medium'>Delivery</span>
-									</div>
-									<span className='font-semibold text-gray-900 text-lg'>
-										{formatPrice(shipping.toString())}
-									</span>
-								</div>
+
 								<div className='flex justify-between py-4 mt-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl px-4'>
 									<span className='text-xl font-bold text-green-800'>
 										Total

@@ -347,6 +347,7 @@ interface ProductDetailProps {
 	id: string;
 	title: string;
 	price: string;
+	price2: number;
 	currency?: string;
 	rating: number;
 	reviewCount: number;
@@ -435,6 +436,23 @@ const ProductDetail = ({ product }: { product: ProductDetailProps }) => {
 		})
 			.format(parsedPrice)
 			.replace("NGN", "₦");
+	};
+
+	const formatAdaPrice = (price: string | number) => {
+		// Ensure price is a string and handle different formats
+		const priceStr = typeof price === "string" ? price : String(price);
+
+		// Extract numeric value from string (handles cases like "₳1000", "1000", "1,000", etc.)
+		const numericValue = priceStr.replace(/[^0-9.-]+/g, "");
+		const parsedPrice = parseFloat(numericValue) || 0;
+
+		return new Intl.NumberFormat("en-US", {
+			style: "currency",
+			currency: "ADA",
+			currencyDisplay: "symbol",
+		})
+			.format(parsedPrice)
+			.replace("ADA", "₳");
 	};
 
 	return (
@@ -542,7 +560,7 @@ const ProductDetail = ({ product }: { product: ProductDetailProps }) => {
 					<div className='border-t border-b border-gray-200 py-4 my-4'>
 						<div className='mb-2 text-gray-600'>Price:</div>
 						<div className='text-3xl font-bold text-gray-900 mb-4'>
-							{formatPrice(product.price)}
+							{formatPrice(product.price)}={formatAdaPrice(product.price2)}
 						</div>
 
 						<div className='mb-2 text-gray-600'>Quantity:</div>

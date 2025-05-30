@@ -145,7 +145,7 @@ const Checkout = () => {
 	return (
 		<div className='min-h-screen bg-gray-50'>
 			{/* Header */}
-			<div className='bg-white shadow-sm border-b'>
+			<div className='bg-white shadow-sm '>
 				<div className='max-w-7xl mx-auto px-4 py-6'>
 					<button
 						onClick={handleBack}
@@ -176,7 +176,7 @@ const Checkout = () => {
 					{/* Left Section - Forms */}
 					<div className='lg:col-span-2 space-y-8'>
 						{/* Contact Information */}
-						<div className='bg-white rounded-2xl shadow-sm border p-8'>
+						<div className='bg-white rounded-2xl shadow-sm  p-8'>
 							<div className='flex items-center mb-6'>
 								<div className='w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3'>
 									1
@@ -197,7 +197,7 @@ const Checkout = () => {
 										value={contactData.email}
 										onChange={handleContactChange}
 										placeholder='Enter your email'
-										className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+										className='w-full px-4 py-3 border border-gray-300 outline-none rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
 									/>
 								</div>
 								<div className='space-y-2'>
@@ -210,14 +210,14 @@ const Checkout = () => {
 										value={contactData.phone}
 										onChange={handleContactChange}
 										placeholder='+234 xxx xxx xxxx'
-										className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+										className='w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
 									/>
 								</div>
 							</div>
 						</div>
 
 						{/* Delivery Information */}
-						<div className='bg-white rounded-2xl shadow-sm border p-8'>
+						<div className='bg-white rounded-2xl shadow-sm  p-8'>
 							<div className='flex items-center mb-6'>
 								<div className='w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3'>
 									2
@@ -239,7 +239,7 @@ const Checkout = () => {
 											value={shippingData.firstName}
 											onChange={handleShippingChange}
 											placeholder='Enter first name'
-											className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+											className='w-full px-4 py-3 outline-none border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
 										/>
 									</div>
 									<div className='space-y-2'>
@@ -252,7 +252,7 @@ const Checkout = () => {
 											value={shippingData.lastName}
 											onChange={handleShippingChange}
 											placeholder='Enter last name'
-											className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+											className='w-full px-4 py-3 border outline-none border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
 										/>
 									</div>
 								</div>
@@ -267,7 +267,7 @@ const Checkout = () => {
 										value={shippingData.address}
 										onChange={handleShippingChange}
 										placeholder='Enter your street address'
-										className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+										className='w-full px-4 py-3 border outline-none border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
 									/>
 								</div>
 
@@ -281,7 +281,7 @@ const Checkout = () => {
 										value={shippingData.apartment}
 										onChange={handleShippingChange}
 										placeholder='Apartment, suite, unit, building, floor, etc.'
-										className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+										className='w-full px-4 py-3 border outline-none border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
 									/>
 								</div>
 
@@ -296,7 +296,7 @@ const Checkout = () => {
 											value={shippingData.city}
 											onChange={handleShippingChange}
 											placeholder='Enter city'
-											className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+											className='w-full px-4 py-3 border outline-none border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
 										/>
 									</div>
 									<div className='space-y-2'>
@@ -307,7 +307,7 @@ const Checkout = () => {
 											name='state'
 											value={shippingData.state}
 											onChange={handleShippingChange}
-											className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 appearance-none bg-white'>
+											className='w-full px-4 py-3 border outline-none border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 appearance-none bg-white'>
 											<option value=''>Select state</option>
 											<option value='lagos'>Lagos</option>
 											<option value='abuja'>Abuja</option>
@@ -326,7 +326,7 @@ const Checkout = () => {
 											value={shippingData.zipCode}
 											onChange={handleShippingChange}
 											placeholder='Enter zip code'
-											className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+											className='w-full px-4 py-3 outline-none border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
 										/>
 									</div>
 								</div>
@@ -334,7 +334,7 @@ const Checkout = () => {
 						</div>
 
 						{/* Shipping Method */}
-						<div className='bg-white rounded-2xl shadow-sm border p-8'>
+						<div className='bg-white rounded-2xl shadow-sm  p-8'>
 							<div className='flex items-center mb-6'>
 								<div className='w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3'>
 									3
@@ -404,7 +404,7 @@ const Checkout = () => {
 
 					{/* Right Section - Order Summary */}
 					<div className='lg:col-span-1'>
-						<div className='bg-white rounded-2xl shadow-sm border p-8 sticky top-8'>
+						<div className='bg-white rounded-2xl shadow-sm p-8 sticky top-8'>
 							<h2 className='text-xl font-semibold text-gray-900 mb-6'>
 								Order Summary
 							</h2>
