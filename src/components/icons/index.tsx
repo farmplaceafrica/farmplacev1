@@ -6,6 +6,7 @@ import Resource from "/public/assets/icons/resource.svg";
 import Ai from "/public/assets/icons/ai.svg";
 import Blockchain from "/public/assets/icons/blockchain.svg";
 import Plus from "/public/assets/icons/plus.svg";
+import Swap from "/public/assets/icons/swap.svg";
 
 const Icons = {
 	Hide,
@@ -16,6 +17,7 @@ const Icons = {
 	Ai,
 	Blockchain,
 	Plus,
+	Swap,
 };
 
 export default Icons;

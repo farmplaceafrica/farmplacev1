@@ -1,8 +1,15 @@
+"use client";
 import React from "react";
 import Image from "next/image";
 import Button from "@/components/global/Button";
-
+import { useRouter } from "next/navigation";
 const Hero = () => {
+	const router = useRouter();
+
+	const handleGetStarted = () => {
+		router.push("auth/register/1");
+	};
+
 	return (
 		<>
 			{/* <div className='bg-[#4A7C59] relative overflow-hidden rounded-3xl mx-4 my-8 h-[690px]'> */}
@@ -30,7 +37,9 @@ const Hero = () => {
 						listing products, and connecting directly with buyers.
 					</p>
 
-					<Button className='bg-[#7CB342] hover:bg-[#689F38] text-white px-8 py-4 rounded-full text-lg font-semibold transition-colors duration-300'>
+					<Button
+						onClick={handleGetStarted}
+						className='bg-[#7CB342] hover:bg-[#689F38] text-white px-8 py-4 rounded-full text-lg font-semibold transition-colors duration-300'>
 						Get Started
 					</Button>
 				</div>

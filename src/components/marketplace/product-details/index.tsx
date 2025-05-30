@@ -337,6 +337,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/context/CardContext";
+import Icons from "@/components/icons";
 
 interface ProductImageProps {
 	src: string;
@@ -560,7 +561,9 @@ const ProductDetail = ({ product }: { product: ProductDetailProps }) => {
 					<div className='border-t border-b border-gray-200 py-4 my-4'>
 						<div className='mb-2 text-gray-600'>Price:</div>
 						<div className='text-3xl font-bold text-gray-900 mb-4'>
-							{formatPrice(product.price)}={formatAdaPrice(product.price2)}
+							{formatPrice(product.price)}
+							<Icons.Swap className='inline-block mx-2 bg-[#99e199] rounded-full' />
+							{formatAdaPrice(product.price2)}
 						</div>
 
 						<div className='mb-2 text-gray-600'>Quantity:</div>
