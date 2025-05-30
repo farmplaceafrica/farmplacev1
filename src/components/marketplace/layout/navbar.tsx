@@ -462,7 +462,7 @@ const DashboardNavbar = () => {
 									Marketplace
 									<span className='absolute -bottom-1 left-0 w-0 h-0.5 bg-green-600 transition-all duration-200 group-hover:w-full'></span>
 								</Link>
-								<Link
+								{/* <Link
 									href='/categories'
 									className='text-gray-700 hover:text-green-600 font-medium transition-colors duration-200 relative group'>
 									Categories
@@ -473,7 +473,7 @@ const DashboardNavbar = () => {
 									className='text-gray-700 hover:text-green-600 font-medium transition-colors duration-200 relative group'>
 									Sellers
 									<span className='absolute -bottom-1 left-0 w-0 h-0.5 bg-green-600 transition-all duration-200 group-hover:w-full'></span>
-								</Link>
+								</Link> */}
 							</nav>
 						</div>
 
@@ -527,20 +527,11 @@ const DashboardNavbar = () => {
 								<button
 									onClick={toggleProfileDropdown}
 									className='flex items-center space-x-2 p-2 text-gray-600 hover:text-green-600 transition-colors duration-200 group'>
-									{user.avatar ? (
-										<Image
-											src={user.avatar}
-											alt='Profile'
-											width={28}
-											height={28}
-											className='rounded-full object-cover'
-										/>
-									) : (
-										<User
-											size={24}
-											className='group-hover:scale-110 transition-transform duration-200'
-										/>
-									)}
+									<User
+										size={24}
+										className='group-hover:scale-110 transition-transform duration-200'
+									/>
+
 									<ChevronDown
 										size={16}
 										className={`transition-transform duration-200 ${
@@ -557,7 +548,7 @@ const DashboardNavbar = () => {
 											<div className='flex items-center space-x-3'>
 												{user.avatar ? (
 													<Image
-														src={user.avatar || "/assets/images/me.jpg"}
+														src='/assets/images/me.jpg'
 														alt='Profile'
 														width={40}
 														height={40}

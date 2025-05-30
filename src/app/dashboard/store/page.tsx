@@ -153,7 +153,7 @@ const FarmPlaceStoreCreation: React.FC = () => {
 						method: "GET",
 						headers: {
 							"Content-Type": "application/json",
-							Authorization: `Bearer ${token}`, // Ensure "Bearer" is included
+							// Ensure "Bearer" is included
 						},
 					}
 				);
