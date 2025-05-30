@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { Upload, X } from "lucide-react";
+import { Upload, X, CheckCircle, AlertCircle } from "lucide-react";
 
 interface ProductImage {
 	file: File;
@@ -14,19 +14,58 @@ interface ProductFormData {
 	category: string;
 	description: string;
 	location: string;
+	quantity: number;
 	priceNGN: string;
-	priceADA: string;
 	mainImage: ProductImage | null;
 	additionalImages: ProductImage[];
 }
 
 interface ProductFormProps {
-	onSubmit?: (data: ProductFormData) => void;
+	onSubmit?: (data: ProductFormData) => Promise<void>;
 	onSaveDraft?: (data: ProductFormData) => void;
 	initialData?: Partial<ProductFormData>;
 	categories?: string[];
 	locations?: string[];
 }
+
+interface ToastProps {
+	type: "success" | "error";
+	message: string;
+	onClose: () => void;
+}
+
+const Toast: React.FC<ToastProps> = ({ type, message, onClose }) => {
+	React.useEffect(() => {
+		const timer = setTimeout(() => {
+			onClose();
+		}, 5000);
+
+		return () => clearTimeout(timer);
+	}, [onClose]);
+
+	return (
+		<div className='fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300'>
+			<div
+				className={`flex items-center p-4 rounded-lg shadow-lg max-w-md ${
+					type === "success"
+						? "bg-green-50 border border-green-200 text-green-800"
+						: "bg-red-50 border border-red-200 text-red-800"
+				}`}>
+				{type === "success" ? (
+					<CheckCircle className='w-5 h-5 mr-3 text-green-600' />
+				) : (
+					<AlertCircle className='w-5 h-5 mr-3 text-red-600' />
+				)}
+				<p className='flex-1 text-sm font-medium'>{message}</p>
+				<button
+					onClick={onClose}
+					className='ml-3 text-gray-400 hover:text-gray-600'>
+					<X className='w-4 h-4' />
+				</button>
+			</div>
+		</div>
+	);
+};
 
 const ProductForm: React.FC<ProductFormProps> = ({
 	onSubmit,
@@ -41,13 +80,27 @@ const ProductForm: React.FC<ProductFormProps> = ({
 		description: initialData?.description || "",
 		location: initialData?.location || "Calabar",
 		priceNGN: initialData?.priceNGN || "",
-		priceADA: initialData?.priceADA || "",
+		quantity: initialData?.quantity || 1,
 		mainImage: initialData?.mainImage || null,
 		additionalImages: initialData?.additionalImages || [],
 	});
 
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [toast, setToast] = useState<{
+		type: "success" | "error";
+		message: string;
+	} | null>(null);
+
 	const mainImageRef = useRef<HTMLInputElement>(null);
 	const additionalImagesRef = useRef<HTMLInputElement>(null);
+
+	const showToast = (type: "success" | "error", message: string) => {
+		setToast({ type, message });
+	};
+
+	const closeToast = () => {
+		setToast(null);
+	};
 
 	const handleInputChange = (
 		e: React.ChangeEvent<
@@ -82,7 +135,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 				mainImage: createImagePreview(file),
 			}));
 		} else {
-			alert("Please select a JPEG or PNG file under 50MB");
+			showToast("error", "Please select a JPEG or PNG file under 50MB");
 		}
 	};
 
@@ -97,7 +150,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
 		);
 
 		if (validFiles.length !== files.length) {
-			alert(
+			showToast(
+				"error",
 				"Some files were skipped. Please select only JPEG or PNG files under 50MB"
 			);
 		}
@@ -106,7 +160,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 		const totalImages = formData.additionalImages.length + newImages.length;
 
 		if (totalImages > 3) {
-			alert("You can only upload up to 3 additional images");
+			showToast("error", "You can only upload up to 3 additional images");
 			return;
 		}
 
@@ -136,13 +190,51 @@ const ProductForm: React.FC<ProductFormProps> = ({
 		}));
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const validateForm = () => {
+		if (!formData.productName.trim()) {
+			showToast("error", "Product name is required");
+			return false;
+		}
+		if (!formData.description.trim()) {
+			showToast("error", "Description is required");
+			return false;
+		}
+		if (!formData.priceNGN.trim()) {
+			showToast("error", "NGN price is required");
+			return false;
+		}
+		if (!formData.quantity || formData.quantity < 1) {
+			showToast("error", "Quantity must be at least 1");
+			return false;
+		}
+		if (!formData.mainImage) {
+			showToast("error", "Main product image is required");
+			return false;
+		}
+		return true;
+	};
+
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		onSubmit?.(formData);
+
+		if (!validateForm()) {
+			return;
+		}
+
+		setIsSubmitting(true);
+
+		try {
+			await onSubmit?.(formData);
+		} catch (error) {
+			console.error("Form submission error:", error);
+		} finally {
+			setIsSubmitting(false);
+		}
 	};
 
 	const handleSaveDraft = () => {
 		onSaveDraft?.(formData);
+		showToast("success", "Draft saved successfully!");
 	};
 
 	const getCharacterCount = () => {
@@ -150,7 +242,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
 	};
 
 	return (
-		<div className='min-h-screen bg-gray-100  p-0 lg:p-6'>
+		<div className='min-h-screen bg-gray-100 p-0 lg:p-6'>
+			{toast && (
+				<Toast type={toast.type} message={toast.message} onClose={closeToast} />
+			)}
+
 			<div className=' w-full lg:max-w-6xl mx-auto'>
 				{/* Header */}
 				<div className='flex justify-between items-center mb-8'>
@@ -159,14 +255,16 @@ const ProductForm: React.FC<ProductFormProps> = ({
 						<button
 							type='button'
 							onClick={handleSaveDraft}
-							className='px-6 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors'>
+							disabled={isSubmitting}
+							className='px-6 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'>
 							Save as Draft
 						</button>
 						<button
 							type='submit'
 							form='product-form'
-							className='px-2 py-2 text-white text-sm bg-green-600 rounded-lg hover:bg-green-700 transition-colors'>
-							Upload Product
+							disabled={isSubmitting}
+							className='px-2 py-2 text-white text-sm bg-green-600 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'>
+							{isSubmitting ? "Uploading..." : "Upload Product"}
 						</button>
 					</div>
 				</div>
@@ -259,7 +357,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 									<label className='block text-sm font-medium text-gray-700 mb-2'>
 										Price
 									</label>
-									<div className='grid grid-cols-2 gap-4'>
+									<div className=' gap-4'>
 										<input
 											type='text'
 											name='priceNGN'
@@ -269,16 +367,22 @@ const ProductForm: React.FC<ProductFormProps> = ({
 											className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none'
 											required
 										/>
-										<input
-											type='text'
-											name='priceADA'
-											value={formData.priceADA}
-											onChange={handleInputChange}
-											placeholder='0 ADA'
-											className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none'
-											required
-										/>
 									</div>
+								</div>
+								{/* Quantity */}
+								<div>
+									<label className='block text-sm font-medium text-gray-700 mb-2'>
+										Quantity
+									</label>
+									<input
+										type='number'
+										name='quantity'
+										value={formData.quantity}
+										onChange={handleInputChange}
+										min='1'
+										className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none'
+										required
+									/>
 								</div>
 							</div>
 
@@ -423,8 +527,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
 					<button
 						type='submit'
 						form='product-form'
-						className='px-12 py-3 text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors font-medium'>
-						Upload Product
+						disabled={isSubmitting}
+						className='px-12 py-3 text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed'>
+						{isSubmitting ? "Uploading Product..." : "Upload Product"}
 					</button>
 				</div>
 			</div>

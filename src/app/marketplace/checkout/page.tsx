@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/context/CardContext";
@@ -12,8 +12,16 @@ const Checkout = () => {
 	const [discountAmount, setDiscountAmount] = useState(0);
 	const [appliedDiscount, setAppliedDiscount] = useState(false);
 	const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const [shippingMethod, setShippingMethod] = useState("economy");
 
-	// Payment form
+	// Contact information
+	const [contactData, setContactData] = useState({
+		email: "",
+		phone: "",
+	});
+
+	// Shipping form
 	const [shippingData, setShippingData] = useState({
 		firstName: "",
 		lastName: "",
@@ -22,13 +30,21 @@ const Checkout = () => {
 		city: "",
 		state: "",
 		zipCode: "",
-		phone: "",
 	});
+
+	// Add useEffect to handle loading state
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setIsLoading(false);
+		}, 100);
+		return () => clearTimeout(timer);
+	}, []);
 
 	const formatPrice = (price: number | string) => {
 		if (typeof price === "string") {
 			price = parseFloat(price.replace(/[^\d.-]/g, ""));
 		}
+		if (isNaN(price)) price = 0;
 
 		return new Intl.NumberFormat("en-NG", {
 			style: "currency",
@@ -42,20 +58,24 @@ const Checkout = () => {
 	const calculateSubtotal = () => {
 		return cartItems.reduce((total, item) => {
 			const price = parseFloat(item.price.replace(/[^\d.-]/g, ""));
-			return total + price * item.quantity;
+			const validPrice = isNaN(price) ? 0 : price;
+			return total + validPrice * item.quantity;
 		}, 0);
 	};
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleContactChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
-		setShippingData((prev) => ({
-			...prev,
-			[name]: value,
-		}));
+		setContactData((prev) => ({ ...prev, [name]: value }));
+	};
+
+	const handleShippingChange = (
+		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+	) => {
+		const { name, value } = e.target;
+		setShippingData((prev) => ({ ...prev, [name]: value }));
 	};
 
 	const handleApplyCoupon = () => {
-		// Simple mock implementation for coupon
 		if (couponCode.toLowerCase() === "discount10") {
 			const discount = calculateSubtotal() * 0.1;
 			setDiscountAmount(discount);
@@ -70,28 +90,48 @@ const Checkout = () => {
 		router.push("/marketplace/cart-view");
 	};
 
-	const handleNextStep = () => {
-		if (!paymentMethod) {
-			setPaymentMethod("card");
-		} else {
-			// Process payment and complete order
-			// For demonstration, we'll just clear the cart and redirect
-			alert("Order placed successfully!");
-			clearCart();
-			router.push("/dashboard/marketplace");
-		}
+	const handlePlaceOrder = () => {
+		alert("Order placed successfully!");
+		clearCart();
+		router.push("/marketplace");
 	};
 
-	if (cartItems.length === 0) {
+	if (isLoading) {
 		return (
-			<div className='max-w-6xl mx-auto p-4 '>
-				<h1 className='text-2xl font-bold mb-8'>Checkout</h1>
-				<div className='bg-white rounded-lg shadow-md p-8 text-center'>
-					<div className='text-gray-500 mb-4 text-lg'>Your cart is empty</div>
+			<div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+				<div className='animate-spin rounded-full h-12 w-12 border-b-2 border-green-600'></div>
+			</div>
+		);
+	}
+
+	if (!cartItems || cartItems.length === 0) {
+		return (
+			<div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+				<div className='bg-white rounded-2xl shadow-lg p-12 text-center max-w-md mx-4'>
+					<div className='w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center'>
+						<svg
+							className='w-10 h-10 text-green-600'
+							fill='none'
+							stroke='currentColor'
+							viewBox='0 0 24 24'>
+							<path
+								strokeLinecap='round'
+								strokeLinejoin='round'
+								strokeWidth={2}
+								d='M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z'
+							/>
+						</svg>
+					</div>
+					<h2 className='text-2xl font-bold text-gray-900 mb-4'>
+						Your cart is empty
+					</h2>
+					<p className='text-gray-500 mb-8'>
+						Add some fresh produce to get started!
+					</p>
 					<button
-						onClick={() => router.push("/dashboard/marketplace")}
-						className='bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors'>
-						Continue Shopping
+						onClick={() => router.push("/marketplace")}
+						className='bg-gradient-to-r from-green-600 to-green-700 text-white py-3 px-8 rounded-xl font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 transform hover:scale-105'>
+						Start Shopping
 					</button>
 				</div>
 			</div>
@@ -99,317 +139,393 @@ const Checkout = () => {
 	}
 
 	const subtotal = calculateSubtotal();
-	const shipping = 5000; // Default shipping cost
-	const total = subtotal + shipping - discountAmount;
+	const shippingCost = shippingMethod === "standard" ? 10000 : 5000;
+	const total = subtotal + shippingCost - discountAmount;
 
 	return (
-		<div className='w-[80%] mx-auto p-4 mt-6'>
-			<button
-				onClick={handleBack}
-				className='flex cursor-pointer items-center mb-8 text-gray-600 hover:text-gray-900 transition-colors'>
-				<svg
-					xmlns='http://www.w3.org/2000/svg'
-					className='h-5 w-5 mr-1'
-					viewBox='0 0 20 20'
-					fill='currentColor'>
-					<path
-						fillRule='evenodd'
-						d='M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z'
-						clipRule='evenodd'
-					/>
-				</svg>
-				Back
-			</button>
-
-			<div className='flex flex-col lg:flex-row gap-8'>
-				{/* Left Section - Customer Details */}
-				<div className='lg:w-2/3'>
-					<div className='bg-white p-6 rounded-lg shadow-md mb-6'>
-						<h2 className='text-xl font-semibold mb-4'>Your Details</h2>
-
-						<div className='mb-4'>
-							<p className='text-gray-700'>
-								<span className='font-medium'>Name:</span> Ubuntu Farms
-							</p>
-							<p className='text-gray-700'>
-								<span className='font-medium'>Email:</span>{" "}
-								ubuntufarms@gmail.com
-							</p>
-						</div>
-					</div>
-
-					<div className='bg-white p-6 rounded-lg shadow-md mb-6'>
-						<h2 className='text-xl font-semibold mb-4'>Delivery Information</h2>
-
-						<div className='mb-4'>
-							<label className='block text-gray-700 mb-2'>Country/Region</label>
-							<div className='relative'>
-								<div className='flex items-center border rounded-md p-2 bg-gray-50'>
-									<div className='flex items-center'>
-										<span className='mr-2'>
-											<div className='w-6 h-4 bg-green-600 relative'>
-												<div className='absolute inset-0 flex items-center justify-center'>
-													<div className='w-1/2 h-full bg-white'></div>
-												</div>
-											</div>
-										</span>
-										<span>Nigeria</span>
-									</div>
-									<svg
-										className='w-4 h-4 ml-auto'
-										viewBox='0 0 20 20'
-										fill='currentColor'>
-										<path
-											fillRule='evenodd'
-											d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'
-											clipRule='evenodd'
-										/>
-									</svg>
-								</div>
-							</div>
-						</div>
-
-						<div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
-							<div>
-								<label className='block text-gray-700 mb-2'>First Name</label>
-								<input
-									type='text'
-									name='firstName'
-									value={shippingData.firstName || "Ubuntu"}
-									onChange={handleInputChange}
-									className='w-full border rounded-md p-2'
-								/>
-							</div>
-							<div>
-								<label className='block text-gray-700 mb-2'>Last Name</label>
-								<input
-									type='text'
-									name='lastName'
-									value={shippingData.lastName || "Farms"}
-									onChange={handleInputChange}
-									className='w-full border rounded-md p-2'
-								/>
-							</div>
-						</div>
-
-						<div className='mb-4'>
-							<label className='block text-gray-700 mb-2'>Address</label>
-							<input
-								type='text'
-								name='address'
-								value={shippingData.address || "No. 33b Lorem Ipsum Dolor"}
-								onChange={handleInputChange}
-								className='w-full border rounded-md p-2'
+		<div className='min-h-screen bg-gray-50'>
+			{/* Header */}
+			<div className='bg-white shadow-sm border-b'>
+				<div className='max-w-7xl mx-auto px-4 py-6'>
+					<button
+						onClick={handleBack}
+						className='flex items-center text-gray-600 hover:text-gray-900 transition-colors group mb-4'>
+						<svg
+							className='h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform'
+							fill='none'
+							stroke='currentColor'
+							viewBox='0 0 24 24'>
+							<path
+								strokeLinecap='round'
+								strokeLinejoin='round'
+								strokeWidth={2}
+								d='M15 19l-7-7 7-7'
 							/>
-						</div>
-
-						<div className='mb-4'>
-							<button className='flex items-center text-green-600 hover:text-green-700'>
-								<svg
-									xmlns='http://www.w3.org/2000/svg'
-									className='h-5 w-5 mr-1'
-									viewBox='0 0 20 20'
-									fill='currentColor'>
-									<path
-										fillRule='evenodd'
-										d='M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z'
-										clipRule='evenodd'
-									/>
-								</svg>
-								Add apartment, suites, etc.
-							</button>
-						</div>
-
-						<div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-4'>
-							<div>
-								<label className='block text-gray-700 mb-2'>City</label>
-								<input
-									type='text'
-									name='city'
-									value={shippingData.city || "Lorem Ipsum"}
-									onChange={handleInputChange}
-									className='w-full border rounded-md p-2'
-								/>
-							</div>
-							<div>
-								<label className='block text-gray-700 mb-2'>State</label>
-								<div className='relative'>
-									<select
-										name='state'
-										className='w-full border rounded-md p-2 appearance-none bg-white pr-8'>
-										<option>Lorem Ipsum</option>
-									</select>
-									<div className='absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none'>
-										<svg
-											className='w-4 h-4'
-											viewBox='0 0 20 20'
-											fill='currentColor'>
-											<path
-												fillRule='evenodd'
-												d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'
-												clipRule='evenodd'
-											/>
-										</svg>
-									</div>
-								</div>
-							</div>
-							<div>
-								<label className='block text-gray-700 mb-2'>Zip Code</label>
-								<input
-									type='text'
-									name='zipCode'
-									value={shippingData.zipCode || "123445"}
-									onChange={handleInputChange}
-									className='w-full border rounded-md p-2'
-								/>
-							</div>
-						</div>
-
-						<div className='mb-4'>
-							<label className='block text-gray-700 mb-2'>Phone number</label>
-							<div className='relative'>
-								<input
-									type='text'
-									name='phone'
-									value={shippingData.phone || "+234 812 345 6789"}
-									onChange={handleInputChange}
-									className='w-full border rounded-md p-2 pl-10'
-								/>
-								<div className='absolute right-2 top-1/2 transform -translate-y-1/2'>
-									<svg
-										xmlns='http://www.w3.org/2000/svg'
-										className='h-5 w-5 text-gray-400'
-										viewBox='0 0 20 20'
-										fill='currentColor'>
-										<path
-											fillRule='evenodd'
-											d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z'
-											clipRule='evenodd'
-										/>
-									</svg>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div className='bg-white p-6 rounded-lg shadow-md mb-6'>
-						<h2 className='text-xl font-semibold mb-4'>Shipping Method</h2>
-
-						<div className='space-y-3'>
-							<label className='flex items-center justify-between p-3 border rounded-md'>
-								<div className='flex items-center'>
-									<input
-										type='radio'
-										name='shipping'
-										value='economy'
-										defaultChecked
-										className='h-4 w-4 text-green-600'
-									/>
-									<span className='ml-2'>Economy</span>
-								</div>
-								<span>{formatPrice(5000)}</span>
-							</label>
-
-							<label className='flex items-center justify-between p-3 border rounded-md'>
-								<div className='flex items-center'>
-									<input
-										type='radio'
-										name='shipping'
-										value='standard'
-										className='h-4 w-4 text-green-600'
-									/>
-									<span className='ml-2'>Standard</span>
-								</div>
-								<span>{formatPrice(10000)}</span>
-							</label>
-						</div>
-					</div>
-
-					<div className='mt-6'>
-						<button
-							onClick={handleNextStep}
-							className='w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium'>
-							Next - Select Payment Method
-						</button>
-					</div>
+						</svg>
+						Back to Cart
+					</button>
+					<h1 className='text-3xl font-bold text-gray-900'>Checkout</h1>
+					<p className='text-gray-600 mt-2'>
+						Complete your order in just a few steps
+					</p>
 				</div>
+			</div>
 
-				{/* Right Section - Order Summary */}
-				<div className='lg:w-1/3'>
-					<div className='bg-white p-6 rounded-lg shadow-md'>
-						<h2 className='text-xl font-semibold mb-4'>Order Summary</h2>
+			<div className='max-w-7xl mx-auto px-4 py-8'>
+				<div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+					{/* Left Section - Forms */}
+					<div className='lg:col-span-2 space-y-8'>
+						{/* Contact Information */}
+						<div className='bg-white rounded-2xl shadow-sm border p-8'>
+							<div className='flex items-center mb-6'>
+								<div className='w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3'>
+									1
+								</div>
+								<h2 className='text-xl font-semibold text-gray-900'>
+									Contact Information
+								</h2>
+							</div>
 
-						<div className='mb-4'>
-							{cartItems.map((item) => (
-								<div
-									key={item.id}
-									className='flex mb-4 pb-4 border-b border-gray-200'>
-									<div className='h-16 w-16 flex-shrink-0 mr-4 relative'>
-										<Image
-											src={item.image}
-											alt={item.title}
-											fill
-											className='object-cover rounded-md'
-											sizes='64px'
+							<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+								<div className='space-y-2'>
+									<label className='text-sm font-medium text-gray-700'>
+										Email Address *
+									</label>
+									<input
+										type='email'
+										name='email'
+										value={contactData.email}
+										onChange={handleContactChange}
+										placeholder='Enter your email'
+										className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+									/>
+								</div>
+								<div className='space-y-2'>
+									<label className='text-sm font-medium text-gray-700'>
+										Phone Number *
+									</label>
+									<input
+										type='tel'
+										name='phone'
+										value={contactData.phone}
+										onChange={handleContactChange}
+										placeholder='+234 xxx xxx xxxx'
+										className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+									/>
+								</div>
+							</div>
+						</div>
+
+						{/* Delivery Information */}
+						<div className='bg-white rounded-2xl shadow-sm border p-8'>
+							<div className='flex items-center mb-6'>
+								<div className='w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3'>
+									2
+								</div>
+								<h2 className='text-xl font-semibold text-gray-900'>
+									Delivery Address
+								</h2>
+							</div>
+
+							<div className='space-y-6'>
+								<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+									<div className='space-y-2'>
+										<label className='text-sm font-medium text-gray-700'>
+											First Name *
+										</label>
+										<input
+											type='text'
+											name='firstName'
+											value={shippingData.firstName}
+											onChange={handleShippingChange}
+											placeholder='Enter first name'
+											className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
 										/>
 									</div>
-									<div className='flex-1'>
-										<div className='flex justify-between'>
-											<h3 className='font-medium text-gray-900'>
+									<div className='space-y-2'>
+										<label className='text-sm font-medium text-gray-700'>
+											Last Name *
+										</label>
+										<input
+											type='text'
+											name='lastName'
+											value={shippingData.lastName}
+											onChange={handleShippingChange}
+											placeholder='Enter last name'
+											className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+										/>
+									</div>
+								</div>
+
+								<div className='space-y-2'>
+									<label className='text-sm font-medium text-gray-700'>
+										Street Address *
+									</label>
+									<input
+										type='text'
+										name='address'
+										value={shippingData.address}
+										onChange={handleShippingChange}
+										placeholder='Enter your street address'
+										className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+									/>
+								</div>
+
+								<div className='space-y-2'>
+									<label className='text-sm font-medium text-gray-700'>
+										Apartment, suite, etc. (optional)
+									</label>
+									<input
+										type='text'
+										name='apartment'
+										value={shippingData.apartment}
+										onChange={handleShippingChange}
+										placeholder='Apartment, suite, unit, building, floor, etc.'
+										className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+									/>
+								</div>
+
+								<div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+									<div className='space-y-2'>
+										<label className='text-sm font-medium text-gray-700'>
+											City *
+										</label>
+										<input
+											type='text'
+											name='city'
+											value={shippingData.city}
+											onChange={handleShippingChange}
+											placeholder='Enter city'
+											className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+										/>
+									</div>
+									<div className='space-y-2'>
+										<label className='text-sm font-medium text-gray-700'>
+											State *
+										</label>
+										<select
+											name='state'
+											value={shippingData.state}
+											onChange={handleShippingChange}
+											className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 appearance-none bg-white'>
+											<option value=''>Select state</option>
+											<option value='lagos'>Lagos</option>
+											<option value='abuja'>Abuja</option>
+											<option value='kano'>Kano</option>
+											<option value='ogun'>Ogun</option>
+											<option value='rivers'>Rivers</option>
+										</select>
+									</div>
+									<div className='space-y-2'>
+										<label className='text-sm font-medium text-gray-700'>
+											Zip Code
+										</label>
+										<input
+											type='text'
+											name='zipCode'
+											value={shippingData.zipCode}
+											onChange={handleShippingChange}
+											placeholder='Enter zip code'
+											className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+										/>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Shipping Method */}
+						<div className='bg-white rounded-2xl shadow-sm border p-8'>
+							<div className='flex items-center mb-6'>
+								<div className='w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3'>
+									3
+								</div>
+								<h2 className='text-xl font-semibold text-gray-900'>
+									Shipping Method
+								</h2>
+							</div>
+
+							<div className='space-y-4'>
+								<label
+									className={`flex items-center justify-between p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+										shippingMethod === "economy"
+											? "border-green-500 bg-green-50"
+											: "border-gray-200 hover:border-gray-300"
+									}`}>
+									<div className='flex items-center'>
+										<input
+											type='radio'
+											name='shipping'
+											value='economy'
+											checked={shippingMethod === "economy"}
+											onChange={(e) => setShippingMethod(e.target.value)}
+											className='h-4 w-4 text-green-600 focus:ring-green-500'
+										/>
+										<div className='ml-4'>
+											<span className='font-medium text-gray-900'>
+												Economy Delivery
+											</span>
+											<p className='text-sm text-gray-500'>5-7 business days</p>
+										</div>
+									</div>
+									<span className='font-semibold text-gray-900'>
+										{formatPrice(5000)}
+									</span>
+								</label>
+
+								<label
+									className={`flex items-center justify-between p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+										shippingMethod === "standard"
+											? "border-green-500 bg-green-50"
+											: "border-gray-200 hover:border-gray-300"
+									}`}>
+									<div className='flex items-center'>
+										<input
+											type='radio'
+											name='shipping'
+											value='standard'
+											checked={shippingMethod === "standard"}
+											onChange={(e) => setShippingMethod(e.target.value)}
+											className='h-4 w-4 text-green-600 focus:ring-green-500'
+										/>
+										<div className='ml-4'>
+											<span className='font-medium text-gray-900'>
+												Standard Delivery
+											</span>
+											<p className='text-sm text-gray-500'>2-3 business days</p>
+										</div>
+									</div>
+									<span className='font-semibold text-gray-900'>
+										{formatPrice(10000)}
+									</span>
+								</label>
+							</div>
+						</div>
+					</div>
+
+					{/* Right Section - Order Summary */}
+					<div className='lg:col-span-1'>
+						<div className='bg-white rounded-2xl shadow-sm border p-8 sticky top-8'>
+							<h2 className='text-xl font-semibold text-gray-900 mb-6'>
+								Order Summary
+							</h2>
+
+							{/* Cart Items */}
+							<div className='space-y-4 mb-6'>
+								{cartItems.map((item, index) => (
+									<div
+										key={`${item.id}-${index}`}
+										className='flex items-center space-x-4 p-4 bg-gray-50 rounded-xl'>
+										<div className='relative h-16 w-16 flex-shrink-0'>
+											<Image
+												src={item.image || "/placeholder-image.jpg"}
+												alt={item.title || "Product"}
+												fill
+												className='object-cover rounded-lg'
+												sizes='64px'
+											/>
+											<span className='absolute -top-2 -right-2 bg-green-600 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-medium'>
+												{item.quantity}
+											</span>
+										</div>
+										<div className='flex-1 min-w-0'>
+											<h3 className='font-medium text-gray-900 truncate'>
 												{item.title}
 											</h3>
-											<p className='text-gray-900 font-medium'>
+											<p className='text-sm text-gray-500'>
+												Qty: {item.quantity}
+											</p>
+										</div>
+										<div className='text-right'>
+											<p className='font-semibold text-gray-900'>
 												{formatPrice(
 													parseFloat(item.price.replace(/[^\d.-]/g, "")) *
 														item.quantity
 												)}
 											</p>
 										</div>
-										<p className='text-gray-500'>Quantity: {item.quantity}</p>
 									</div>
+								))}
+							</div>
+
+							{/* Coupon */}
+							<div className='mb-6'>
+								<div className='flex gap-2'>
+									<input
+										type='text'
+										placeholder='Enter coupon code'
+										value={couponCode}
+										onChange={(e) => setCouponCode(e.target.value)}
+										className='flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400'
+									/>
+									<button
+										onClick={handleApplyCoupon}
+										className='px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium'>
+										Apply
+									</button>
 								</div>
-							))}
-						</div>
+								{appliedDiscount && (
+									<p className='text-sm text-green-600 mt-2 flex items-center'>
+										<svg
+											className='w-4 h-4 mr-1'
+											fill='none'
+											stroke='currentColor'
+											viewBox='0 0 24 24'>
+											<path
+												strokeLinecap='round'
+												strokeLinejoin='round'
+												strokeWidth={2}
+												d='M5 13l4 4L19 7'
+											/>
+										</svg>
+										Coupon applied successfully!
+									</p>
+								)}
+							</div>
 
-						<div className='mb-4'>
-							<div className='flex gap-3 items-center'>
-								<input
-									type='text'
-									placeholder='Got a discount code or coupon? Enter it'
-									value={couponCode}
-									onChange={(e) => setCouponCode(e.target.value)}
-									className='flex-1 border rounded-l-md p-2'
-								/>
-								<button
-									onClick={handleApplyCoupon}
-									className='bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors'>
-									Apply
-								</button>
+							{/* Price Breakdown */}
+							<div className='space-y-3 py-4 border-t border-gray-200'>
+								<div className='flex justify-between text-gray-600'>
+									<span>Subtotal</span>
+									<span>{formatPrice(subtotal)}</span>
+								</div>
+								<div className='flex justify-between text-gray-600'>
+									<span>Shipping</span>
+									<span>{formatPrice(shippingCost)}</span>
+								</div>
+								{appliedDiscount && (
+									<div className='flex justify-between text-green-600'>
+										<span>Discount</span>
+										<span>-{formatPrice(discountAmount)}</span>
+									</div>
+								)}
 							</div>
-						</div>
 
-						<div className='space-y-2 pb-4 border-b border-gray-200'>
-							<div className='flex justify-between'>
-								<span className='text-gray-600'>Subtotal</span>
-								<span className='font-medium'>{formatPrice(subtotal)}</span>
+							<div className='flex justify-between py-4 border-t border-gray-200 text-lg font-bold text-gray-900'>
+								<span>Total</span>
+								<span>{formatPrice(total)}</span>
 							</div>
-							<div className='flex justify-between'>
-								<span className='text-gray-600'>Shipping</span>
-								<span className='font-medium'>{formatPrice(shipping)}</span>
-							</div>
-							<div className='flex justify-between text-red-500'>
-								<span>Discount</span>
-								<span>
-									{appliedDiscount
-										? `- ${formatPrice(discountAmount)}`
-										: "- 0.00"}
-								</span>
-							</div>
-						</div>
 
-						<div className='flex justify-between py-4 font-bold text-lg'>
-							<span>Total:</span>
-							<span>{formatPrice(total)}</span>
+							<button
+								onClick={handlePlaceOrder}
+								className='w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 px-6 rounded-xl font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 transform hover:scale-[1.02] shadow-lg'>
+								Complete Order
+							</button>
+
+							<div className='flex items-center justify-center mt-4 text-sm text-gray-500'>
+								<svg
+									className='w-4 h-4 mr-2'
+									fill='none'
+									stroke='currentColor'
+									viewBox='0 0 24 24'>
+									<path
+										strokeLinecap='round'
+										strokeLinejoin='round'
+										strokeWidth={2}
+										d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'
+									/>
+								</svg>
+								Secure and encrypted checkout
+							</div>
 						</div>
 					</div>
 				</div>

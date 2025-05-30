@@ -2,8 +2,8 @@
 
 // import { useState } from "react";
 // import Image from "next/image";
-// import Link from "next/link";
 // import { useRouter } from "next/navigation";
+// import { useCart } from "@/components/context/CardContext";
 
 // interface ProductImageProps {
 // 	src: string;
@@ -14,7 +14,7 @@
 // 	id: string;
 // 	title: string;
 // 	price: string;
-// 	currency: string;
+// 	currency?: string;
 // 	rating: number;
 // 	reviewCount: number;
 // 	availability: string;
@@ -34,6 +34,7 @@
 // 	const [selectedImage, setSelectedImage] = useState(0);
 // 	const [isAddingToCart, setIsAddingToCart] = useState(false);
 // 	const router = useRouter();
+// 	const { addToCart } = useCart();
 
 // 	const decreaseQuantity = () => {
 // 		if (quantity > 1) {
@@ -45,13 +46,28 @@
 // 		setQuantity(quantity + 1);
 // 	};
 
-// 	const addToCart = () => {
+// 	const handleAddToCart = () => {
 // 		setIsAddingToCart(true);
-// 		// Simulate API call or state update
+
+// 		// Add to cart multiple times based on quantity
+// 		for (let i = 0; i < quantity; i++) {
+// 			addToCart(product.id);
+// 		}
+
+// 		// Simulate API call delay
 // 		setTimeout(() => {
 // 			setIsAddingToCart(false);
-// 			router.push("/dashboard/cart-view");
-// 		}, 1000);
+// 		}, 500);
+// 	};
+
+// 	const handleBuyNow = () => {
+// 		// Add to cart first
+// 		handleAddToCart();
+
+// 		// Navigate to cart page
+// 		setTimeout(() => {
+// 			router.push("/marketplace/cart-view");
+// 		}, 600);
 // 	};
 
 // 	const renderStars = (rating: number) => {
@@ -207,6 +223,7 @@
 
 // 						<div className='grid grid-cols-2 gap-4'>
 // 							<button
+// 								onClick={handleAddToCart}
 // 								className='h-12 px-6 border border-green-600 text-green-600 rounded-md flex items-center justify-center font-medium'
 // 								disabled={isAddingToCart}>
 // 								{isAddingToCart ? (
@@ -230,7 +247,7 @@
 // 								)}
 // 							</button>
 // 							<button
-// 								onClick={addToCart}
+// 								onClick={handleBuyNow}
 // 								className='h-12 px-6 bg-green-600 text-white rounded-md flex items-center justify-center font-medium'
 // 								disabled={isAddingToCart}>
 // 								Buy Now
@@ -283,12 +300,12 @@
 // 											/>
 // 										</svg>
 // 									</div>
+
 // 									<span className='ml-2 text-gray-600'>{feature}</span>
 // 								</li>
 // 							))}
 // 						</ul>
 // 					</div>
-
 // 					<div className='col-span-1 md:col-span-1'>
 // 						<h3 className='text-lg font-medium text-gray-900 mb-4'>
 // 							Shipping Information
@@ -313,7 +330,7 @@
 
 // export default ProductDetail;
 
-"use client";
+// Fixed ProductDetail Component
 "use client";
 
 import { useState } from "react";
@@ -402,13 +419,21 @@ const ProductDetail = ({ product }: { product: ProductDetailProps }) => {
 		return stars;
 	};
 
-	const formatPrice = (price: string) => {
+	// Fixed formatPrice function
+	const formatPrice = (price: string | number) => {
+		// Ensure price is a string and handle different formats
+		const priceStr = typeof price === "string" ? price : String(price);
+
+		// Extract numeric value from string (handles cases like "₦1000", "1000", "1,000", etc.)
+		const numericValue = priceStr.replace(/[^0-9.-]+/g, "");
+		const parsedPrice = parseFloat(numericValue) || 0;
+
 		return new Intl.NumberFormat("en-NG", {
 			style: "currency",
 			currency: product.currency || "NGN",
 			currencyDisplay: "symbol",
 		})
-			.format(Number(price.replace(/[^0-9.-]+/g, "")))
+			.format(parsedPrice)
 			.replace("NGN", "₦");
 	};
 
@@ -580,9 +605,7 @@ const ProductDetail = ({ product }: { product: ProductDetailProps }) => {
 						<button className='border-b-2 border-green-600 py-4 px-6 text-sm font-medium text-green-600'>
 							DESCRIPTION
 						</button>
-						<button className='border-b-2 border-transparent py-4 px-6 text-sm font-medium text-gray-500 hover:text-gray-700'>
-							ADDITIONAL INFORMATION
-						</button>
+
 						<button className='border-b-2 border-transparent py-4 px-6 text-sm font-medium text-gray-500 hover:text-gray-700'>
 							REVIEW
 						</button>

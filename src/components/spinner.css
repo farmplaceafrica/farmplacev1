@@ -1,0 +1,24 @@
+/* spinner.css */
+.spinner {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.spinner-circle {
+	width: 30px; /* Adjust the size as needed */
+	height: 30px; /* Adjust the size as needed */
+	border: 5px solid rgb(101, 100, 100);
+	border-top: 5px solid #4bc455; /* Adjust the color as needed */
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}

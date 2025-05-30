@@ -13,6 +13,7 @@ import {
 	Settings,
 	LogOut,
 	X,
+	ShoppingBag,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -30,6 +31,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 		{ icon: Wallet, label: "Wallet", path: "/dashboard/wallet" },
 		{ icon: Plus, label: "Add Product", path: "/dashboard/add-product" },
 		{ icon: BookOpen, label: "Resources", path: "/dashboard/resources" },
+		{ icon: ShoppingBag, label: "My Store", path: "/dashboard/store" },
 	];
 
 	return (
@@ -103,10 +105,12 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 							<Settings size={20} />
 							<span>Settings</span>
 						</Link>
-						<button className='w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors'>
-							<LogOut size={20} />
-							<span>Log out</span>
-						</button>
+						<Link href='/auth/login'>
+							<button className='w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors'>
+								<LogOut size={20} />
+								<span>Log out</span>
+							</button>
+						</Link>
 					</div>
 				</div>
 			</div>
