@@ -1,50 +1,82 @@
-// // pages/register/[step].tsx
 // "use client";
-// import { useRouter, useSearchParams } from "next/navigation";
+// import { useRouter, useParams } from "next/navigation";
 // import { useState, useEffect } from "react";
-// import { Eye, EyeOff } from "lucide-react";
+// import {
+// 	Eye,
+// 	EyeOff,
+// 	User,
+// 	Mail,
+// 	Phone,
+// 	Calendar,
+// 	MapPin,
+// 	Wallet,
+// 	Check,
+// } from "lucide-react";
+// import ConnectWallet from "@/components/global/CardanoWalletButton";
 
 // interface FormData {
-// 	fullName: string;
+// 	fullname: string;
 // 	email: string;
 // 	password: string;
 // 	confirmPassword: string;
-// 	idType: string;
-// 	idFile: File | null;
+// 	birthdate: string;
+// 	gender: "male" | "female" | "";
+// 	phone: string;
+// 	location: string;
+// 	usertype: "farmer" | "buyer" | "admin";
 // 	wallet: string;
 // }
 
+// const STORAGE_KEY = "registration_form_data";
+
 // const RegisterPage = () => {
 // 	const router = useRouter();
-// 	const searchParams = useSearchParams();
-// 	const step = searchParams.get("step");
-// 	const currentStep = parseInt(step || "1");
+// 	const params = useParams();
+// 	const currentStep = parseInt(params.step as string) || 1;
 
-// 	const [formData, setFormData] = useState<FormData>({
-// 		fullName: "",
-// 		email: "",
-// 		password: "",
-// 		confirmPassword: "",
-// 		idType: "National Identity Number",
-// 		idFile: null,
-// 		wallet: "",
+// 	// Initialize form data with stored data or defaults
+// 	const [formData, setFormData] = useState<FormData>(() => {
+// 		if (typeof window !== "undefined") {
+// 			const stored = sessionStorage.getItem(STORAGE_KEY);
+// 			if (stored) {
+// 				const parsedData = JSON.parse(stored);
+// 				return parsedData;
+// 			}
+// 		}
+// 		return {
+// 			fullname: "",
+// 			email: "",
+// 			password: "",
+// 			confirmPassword: "",
+// 			birthdate: "",
+// 			gender: "",
+// 			phone: "",
+// 			location: "",
+// 			usertype: "buyer",
+// 			wallet: "",
+// 		};
 // 	});
 
 // 	const [showPassword, setShowPassword] = useState(false);
 // 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 // 	const [errors, setErrors] = useState<Record<string, string>>({});
+// 	const [isLoading, setIsLoading] = useState(false);
+
+// 	// Save form data to sessionStorage whenever it changes
+// 	useEffect(() => {
+// 		if (typeof window !== "undefined") {
+// 			sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+// 		}
+// 	}, [formData]);
 
 // 	// Redirect to step 1 if invalid step
 // 	useEffect(() => {
-// 		if (currentStep < 1 || currentStep > 3) {
-// 			router.replace("/register/1");
+// 		if (currentStep < 1 || currentStep > 2) {
+// 			router.replace("/auth/register/1");
 // 		}
 // 	}, [currentStep, router]);
 
-// 	const updateFormData = (
-// 		field: keyof FormData,
-// 		value: string | File | null
-// 	) => {
+// 	const updateFormData = (field: keyof FormData, value: string) => {
 // 		setFormData((prev) => ({ ...prev, [field]: value }));
 // 		// Clear error when user starts typing
 // 		if (errors[field]) {
@@ -55,8 +87,8 @@
 // 	const validateStep1 = () => {
 // 		const newErrors: Record<string, string> = {};
 
-// 		if (!formData.fullName.trim()) {
-// 			newErrors.fullName = "Full name is required";
+// 		if (!formData.fullname.trim()) {
+// 			newErrors.fullname = "Full name is required";
 // 		}
 
 // 		if (!formData.email.trim()) {
@@ -75,19 +107,131 @@
 // 			newErrors.confirmPassword = "Passwords do not match";
 // 		}
 
-// 		setErrors(newErrors);
-// 		return Object.keys(newErrors).length === 0;
-// 	};
+// 		if (!formData.birthdate) {
+// 			newErrors.birthdate = "Birth date is required";
+// 		}
 
-// 	const validateStep2 = () => {
-// 		const newErrors: Record<string, string> = {};
+// 		if (!formData.gender) {
+// 			newErrors.gender = "Gender is required";
+// 		}
 
-// 		if (!formData.idFile) {
-// 			newErrors.idFile = "Please upload your ID document";
+// 		if (!formData.phone.trim()) {
+// 			newErrors.phone = "Phone number is required";
+// 		}
+
+// 		if (!formData.location.trim()) {
+// 			newErrors.location = "Location is required";
+// 		}
+
+// 		if (!formData.usertype) {
+// 			newErrors.usertype = "User type is required";
 // 		}
 
 // 		setErrors(newErrors);
 // 		return Object.keys(newErrors).length === 0;
+// 	};
+
+// 	const validateFinalSubmission = () => {
+// 		const newErrors: Record<string, string> = {};
+
+// 		// Basic required fields - check for empty strings properly
+// 		const requiredFields = [
+// 			"fullname",
+// 			"email",
+// 			"password",
+// 			"birthdate",
+// 			"gender",
+// 			"phone",
+// 			"location",
+// 			"usertype",
+// 		];
+
+// 		requiredFields.forEach((field) => {
+// 			const value = formData[field as keyof FormData];
+
+// 			if (!value || (typeof value === "string" && value.trim() === "")) {
+// 				newErrors[field] = `${
+// 					field.charAt(0).toUpperCase() + field.slice(1)
+// 				} is required`;
+// 			}
+// 		});
+
+// 		// Email validation
+// 		if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+// 			newErrors.email = "Please enter a valid email";
+// 		}
+
+// 		// Password validation
+// 		if (formData.password && formData.password.length < 8) {
+// 			newErrors.password = "Password must be at least 8 characters";
+// 		}
+
+// 		// Confirm password validation
+// 		if (formData.password !== formData.confirmPassword) {
+// 			newErrors.confirmPassword = "Passwords do not match";
+// 		}
+
+// 		setErrors(newErrors);
+// 		return Object.keys(newErrors).length === 0;
+// 	};
+
+// 	const handleCreateAccount = async () => {
+// 		setIsLoading(true);
+
+// 		// Clear any previous API errors
+// 		setErrors((prev) => ({ ...prev, api: "" }));
+
+// 		// Validate before submission
+// 		const validationResult = validateFinalSubmission();
+
+// 		if (!validationResult) {
+// 			setIsLoading(false);
+// 			return;
+// 		}
+
+// 		try {
+// 			const submitData = new FormData();
+
+// 			// Add all required fields
+// 			submitData.append("fullname", formData.fullname.trim());
+// 			submitData.append("email", formData.email.trim().toLowerCase());
+// 			submitData.append("password", formData.password);
+// 			submitData.append("birthdate", formData.birthdate);
+// 			submitData.append("gender", formData.gender);
+// 			submitData.append("phone", formData.phone.trim());
+// 			submitData.append("location", formData.location.trim());
+// 			submitData.append("usertype", formData.usertype);
+
+// 			// Wallet is optional
+// 			if (formData.wallet) {
+// 				submitData.append("wallet", formData.wallet);
+// 			}
+
+// 			const response = await fetch(
+// 				"https://farmplace-backend-api.onrender.com/api/v1/auth/register",
+// 				{
+// 					method: "POST",
+// 					body: submitData,
+// 				}
+// 			);
+
+// 			const result = await response.json();
+
+// 			if (response.ok) {
+// 				// Registration successful - clear stored data
+// 				if (typeof window !== "undefined") {
+// 					sessionStorage.removeItem(STORAGE_KEY);
+// 				}
+// 				router.push("/auth/login");
+// 			} else {
+// 				// Handle API errors
+// 				setErrors({ api: result.message || "Registration failed" });
+// 			}
+// 		} catch (error) {
+// 			setErrors({ api: "Network error. Please try again." });
+// 		} finally {
+// 			setIsLoading(false);
+// 		}
 // 	};
 
 // 	const handleContinue = () => {
@@ -95,53 +239,50 @@
 
 // 		if (currentStep === 1) {
 // 			isValid = validateStep1();
+// 			if (isValid) {
+// 				router.push(`/auth/register/${currentStep + 1}`);
+// 			}
 // 		} else if (currentStep === 2) {
-// 			isValid = validateStep2();
-// 		}
-
-// 		if (isValid && currentStep < 3) {
-// 			router.push(`/register/${currentStep + 1}`);
-// 		} else if (currentStep === 3) {
 // 			// Final step - create account
 // 			handleCreateAccount();
 // 		}
 // 	};
 
-// 	const handleCreateAccount = () => {
-// 		// Here you would typically send the data to your API
-// 		console.log("Creating account with data:", formData);
-// 		// Redirect to success page or login
-// 		router.push("/dashboard");
-// 	};
-
-// 	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-// 		const file = event.target.files?.[0] || null;
-// 		updateFormData("idFile", file);
-// 	};
-
-// 	const handleGoogleSignIn = () => {
-// 		// Implement Google Sign In logic
-// 		console.log("Google Sign In");
+// 	const handleBack = () => {
+// 		if (currentStep > 1) {
+// 			router.push(`/auth/register/${currentStep - 1}`);
+// 		}
 // 	};
 
 // 	const renderStepIndicator = () => (
 // 		<div className='flex items-center justify-center mb-8'>
-// 			{[1, 2, 3].map((stepNum) => (
-// 				<div key={stepNum} className='flex items-center'>
-// 					<div
-// 						className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-// 							stepNum < currentStep
-// 								? "bg-green-600 text-white"
-// 								: stepNum === currentStep
-// 								? "bg-green-600 text-white"
-// 								: "bg-gray-200 text-gray-600"
-// 						}`}>
-// 						{stepNum < currentStep ? "✓" : stepNum}
-// 					</div>
-// 					{stepNum < 3 && (
+// 			{[
+// 				{ step: 1, label: "Details", icon: User },
+// 				{ step: 2, label: "Wallet", icon: Wallet },
+// 			].map(({ step, label, icon: Icon }, index) => (
+// 				<div key={step} className='flex items-center'>
+// 					<div className='flex flex-col items-center'>
 // 						<div
-// 							className={`w-16 h-0.5 mx-2 ${
-// 								stepNum < currentStep ? "bg-green-600" : "bg-gray-200"
+// 							className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
+// 								step < currentStep
+// 									? "bg-green-600 text-white shadow-lg"
+// 									: step === currentStep
+// 									? "bg-green-600 text-white shadow-lg scale-110"
+// 									: "bg-gray-200 text-gray-600"
+// 							}`}>
+// 							{step < currentStep ? <Check size={20} /> : <Icon size={20} />}
+// 						</div>
+// 						<span
+// 							className={`mt-2 text-xs font-medium ${
+// 								step <= currentStep ? "text-green-600" : "text-gray-400"
+// 							}`}>
+// 							{label}
+// 						</span>
+// 					</div>
+// 					{index < 1 && (
+// 						<div
+// 							className={`w-16 h-0.5 mx-4 transition-all duration-300 ${
+// 								step < currentStep ? "bg-green-600" : "bg-gray-200"
 // 							}`}
 // 						/>
 // 					)}
@@ -152,44 +293,209 @@
 
 // 	const renderStep1 = () => (
 // 		<div className='space-y-6'>
+// 			<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+// 				<div>
+// 					<label className='block text-sm font-semibold text-gray-700 mb-2'>
+// 						<User className='inline w-4 h-4 mr-2' />
+// 						Full Name
+// 					</label>
+// 					<input
+// 						type='text'
+// 						value={formData.fullname}
+// 						onChange={(e) => updateFormData("fullname", e.target.value)}
+// 						placeholder='Enter your full name'
+// 						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 ${
+// 							errors.fullname
+// 								? "border-red-500 bg-red-50"
+// 								: "border-gray-200 hover:border-gray-300"
+// 						}`}
+// 					/>
+// 					{errors.fullname && (
+// 						<p className='text-red-500 text-sm mt-1 flex items-center'>
+// 							<span className='mr-1'>⚠</span>
+// 							{errors.fullname}
+// 						</p>
+// 					)}
+// 				</div>
+
+// 				<div>
+// 					<label className='block text-sm font-semibold text-gray-700 mb-2'>
+// 						<Mail className='inline w-4 h-4 mr-2' />
+// 						Email
+// 					</label>
+// 					<input
+// 						type='email'
+// 						value={formData.email}
+// 						onChange={(e) => updateFormData("email", e.target.value)}
+// 						placeholder='Enter your email'
+// 						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 ${
+// 							errors.email
+// 								? "border-red-500 bg-red-50"
+// 								: "border-gray-200 hover:border-gray-300"
+// 						}`}
+// 					/>
+// 					{errors.email && (
+// 						<p className='text-red-500 text-sm mt-1 flex items-center'>
+// 							<span className='mr-1'>⚠</span>
+// 							{errors.email}
+// 						</p>
+// 					)}
+// 				</div>
+// 			</div>
+
+// 			<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+// 				<div>
+// 					<label className='block text-sm font-semibold text-gray-700 mb-2'>
+// 						<Phone className='inline w-4 h-4 mr-2' />
+// 						Phone Number
+// 					</label>
+// 					<input
+// 						type='tel'
+// 						value={formData.phone}
+// 						onChange={(e) => updateFormData("phone", e.target.value)}
+// 						placeholder='Enter your phone number'
+// 						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 ${
+// 							errors.phone
+// 								? "border-red-500 bg-red-50"
+// 								: "border-gray-200 hover:border-gray-300"
+// 						}`}
+// 					/>
+// 					{errors.phone && (
+// 						<p className='text-red-500 text-sm mt-1 flex items-center'>
+// 							<span className='mr-1'>⚠</span>
+// 							{errors.phone}
+// 						</p>
+// 					)}
+// 				</div>
+
+// 				<div>
+// 					<label className='block text-sm font-semibold text-gray-700 mb-2'>
+// 						<Calendar className='inline w-4 h-4 mr-2' />
+// 						Birth Date
+// 					</label>
+// 					<input
+// 						type='date'
+// 						value={formData.birthdate}
+// 						onChange={(e) => updateFormData("birthdate", e.target.value)}
+// 						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 ${
+// 							errors.birthdate
+// 								? "border-red-500 bg-red-50"
+// 								: "border-gray-200 hover:border-gray-300"
+// 						}`}
+// 					/>
+// 					{errors.birthdate && (
+// 						<p className='text-red-500 text-sm mt-1 flex items-center'>
+// 							<span className='mr-1'>⚠</span>
+// 							{errors.birthdate}
+// 						</p>
+// 					)}
+// 				</div>
+// 			</div>
+
+// 			<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+// 				<div>
+// 					<label className='block text-sm font-semibold text-gray-700 mb-2'>
+// 						Gender
+// 					</label>
+// 					<select
+// 						value={formData.gender}
+// 						onChange={(e) => updateFormData("gender", e.target.value)}
+// 						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 ${
+// 							errors.gender
+// 								? "border-red-500 bg-red-50"
+// 								: "border-gray-200 hover:border-gray-300"
+// 						}`}>
+// 						<option value=''>Select Gender</option>
+// 						<option value='male'>Male</option>
+// 						<option value='female'>Female</option>
+// 					</select>
+// 					{errors.gender && (
+// 						<p className='text-red-500 text-sm mt-1 flex items-center'>
+// 							<span className='mr-1'>⚠</span>
+// 							{errors.gender}
+// 						</p>
+// 					)}
+// 				</div>
+
+// 				<div>
+// 					<label className='block text-sm font-semibold text-gray-700 mb-2'>
+// 						<MapPin className='inline w-4 h-4 mr-2' />
+// 						Location
+// 					</label>
+// 					<input
+// 						type='text'
+// 						value={formData.location}
+// 						onChange={(e) => updateFormData("location", e.target.value)}
+// 						placeholder='Enter your location'
+// 						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 ${
+// 							errors.location
+// 								? "border-red-500 bg-red-50"
+// 								: "border-gray-200 hover:border-gray-300"
+// 						}`}
+// 					/>
+// 					{errors.location && (
+// 						<p className='text-red-500 text-sm mt-1 flex items-center'>
+// 							<span className='mr-1'>⚠</span>
+// 							{errors.location}
+// 						</p>
+// 					)}
+// 				</div>
+// 			</div>
+
 // 			<div>
-// 				<label className='block text-sm font-medium text-gray-700 mb-2'>
-// 					Full Name
+// 				<label className='block text-sm font-semibold text-gray-700 mb-2'>
+// 					User Type
 // 				</label>
-// 				<input
-// 					type='text'
-// 					value={formData.fullName}
-// 					onChange={(e) => updateFormData("fullName", e.target.value)}
-// 					placeholder='Precious Eyo'
-// 					className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-// 						errors.fullName ? "border-red-500" : "border-gray-300"
-// 					}`}
-// 				/>
-// 				{errors.fullName && (
-// 					<p className='text-red-500 text-sm mt-1'>{errors.fullName}</p>
+// 				<div className='grid grid-cols-2 gap-4'>
+// 					{[
+// 						{
+// 							value: "buyer",
+// 							label: "Buyer",
+// 							desc: "Purchase agricultural products",
+// 						},
+// 						{
+// 							value: "farmer",
+// 							label: "Farmer",
+// 							desc: "Sell agricultural products",
+// 						},
+// 					].map((type) => (
+// 						<div
+// 							key={type.value}
+// 							onClick={() => updateFormData("usertype", type.value)}
+// 							className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+// 								formData.usertype === type.value
+// 									? "border-green-500 bg-green-50"
+// 									: "border-gray-200 hover:border-gray-300"
+// 							}`}>
+// 							<div className='flex items-center justify-between mb-2'>
+// 								<span className='font-semibold text-gray-900'>
+// 									{type.label}
+// 								</span>
+// 								<div
+// 									className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+// 										formData.usertype === type.value
+// 											? "border-green-500 bg-green-500"
+// 											: "border-gray-300"
+// 									}`}>
+// 									{formData.usertype === type.value && (
+// 										<div className='w-2 h-2 bg-white rounded-full' />
+// 									)}
+// 								</div>
+// 							</div>
+// 							<p className='text-sm text-gray-600'>{type.desc}</p>
+// 						</div>
+// 					))}
+// 				</div>
+// 				{errors.usertype && (
+// 					<p className='text-red-500 text-sm mt-1 flex items-center'>
+// 						<span className='mr-1'>⚠</span>
+// 						{errors.usertype}
+// 					</p>
 // 				)}
 // 			</div>
 
 // 			<div>
-// 				<label className='block text-sm font-medium text-gray-700 mb-2'>
-// 					Email
-// 				</label>
-// 				<input
-// 					type='email'
-// 					value={formData.email}
-// 					onChange={(e) => updateFormData("email", e.target.value)}
-// 					placeholder='Email'
-// 					className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-// 						errors.email ? "border-red-500" : "border-gray-300"
-// 					}`}
-// 				/>
-// 				{errors.email && (
-// 					<p className='text-red-500 text-sm mt-1'>{errors.email}</p>
-// 				)}
-// 			</div>
-
-// 			<div>
-// 				<label className='block text-sm font-medium text-gray-700 mb-2'>
+// 				<label className='block text-sm font-semibold text-gray-700 mb-2'>
 // 					Password
 // 				</label>
 // 				<div className='relative'>
@@ -197,25 +503,30 @@
 // 						type={showPassword ? "text" : "password"}
 // 						value={formData.password}
 // 						onChange={(e) => updateFormData("password", e.target.value)}
-// 						placeholder='Password'
-// 						className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent pr-12 ${
-// 							errors.password ? "border-red-500" : "border-gray-300"
+// 						placeholder='Enter your password'
+// 						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 pr-12 ${
+// 							errors.password
+// 								? "border-red-500 bg-red-50"
+// 								: "border-gray-200 hover:border-gray-300"
 // 						}`}
 // 					/>
 // 					<button
 // 						type='button'
 // 						onClick={() => setShowPassword(!showPassword)}
-// 						className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600'>
+// 						className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'>
 // 						{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
 // 					</button>
 // 				</div>
 // 				{errors.password && (
-// 					<p className='text-red-500 text-sm mt-1'>{errors.password}</p>
+// 					<p className='text-red-500 text-sm mt-1 flex items-center'>
+// 						<span className='mr-1'>⚠</span>
+// 						{errors.password}
+// 					</p>
 // 				)}
 // 			</div>
 
 // 			<div>
-// 				<label className='block text-sm font-medium text-gray-700 mb-2'>
+// 				<label className='block text-sm font-semibold text-gray-700 mb-2'>
 // 					Confirm Password
 // 				</label>
 // 				<div className='relative'>
@@ -223,164 +534,81 @@
 // 						type={showConfirmPassword ? "text" : "password"}
 // 						value={formData.confirmPassword}
 // 						onChange={(e) => updateFormData("confirmPassword", e.target.value)}
-// 						placeholder='Confirm Password'
-// 						className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent pr-12 ${
-// 							errors.confirmPassword ? "border-red-500" : "border-gray-300"
+// 						placeholder='Confirm your password'
+// 						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 pr-12 ${
+// 							errors.confirmPassword
+// 								? "border-red-500 bg-red-50"
+// 								: "border-gray-200 hover:border-gray-300"
 // 						}`}
 // 					/>
 // 					<button
 // 						type='button'
 // 						onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-// 						className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600'>
+// 						className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'>
 // 						{showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
 // 					</button>
 // 				</div>
 // 				{errors.confirmPassword && (
-// 					<p className='text-red-500 text-sm mt-1'>{errors.confirmPassword}</p>
+// 					<p className='text-red-500 text-sm mt-1 flex items-center'>
+// 						<span className='mr-1'>⚠</span>
+// 						{errors.confirmPassword}
+// 					</p>
 // 				)}
 // 			</div>
-
-// 			<button
-// 				onClick={handleContinue}
-// 				className='w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors'>
-// 				Continue
-// 			</button>
-
-// 			<div className='text-center'>
-// 				<span className='text-gray-600'>Already have an account? </span>
-// 				<button
-// 					onClick={() => router.push("/login")}
-// 					className='text-green-600 hover:text-green-700 font-medium'>
-// 					Login
-// 				</button>
-// 			</div>
-
-// 			<div className='relative'>
-// 				<div className='absolute inset-0 flex items-center'>
-// 					<div className='w-full border-t border-gray-300' />
-// 				</div>
-// 				<div className='relative flex justify-center text-sm'>
-// 					<span className='px-2 bg-white text-gray-500'>Or</span>
-// 				</div>
-// 			</div>
-
-// 			<button
-// 				onClick={handleGoogleSignIn}
-// 				className='w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors'>
-// 				<svg className='w-5 h-5 mr-2' viewBox='0 0 24 24'>
-// 					<path
-// 						fill='#4285f4'
-// 						d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'
-// 					/>
-// 					<path
-// 						fill='#34a853'
-// 						d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'
-// 					/>
-// 					<path
-// 						fill='#fbbc05'
-// 						d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z'
-// 					/>
-// 					<path
-// 						fill='#ea4335'
-// 						d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z'
-// 					/>
-// 				</svg>
-// 				Continue with Google
-// 			</button>
 // 		</div>
 // 	);
 
 // 	const renderStep2 = () => (
 // 		<div className='space-y-6'>
-// 			<div>
-// 				<label className='block text-sm font-medium text-gray-700 mb-2'>
-// 					ID Type
-// 				</label>
-// 				<select
-// 					value={formData.idType}
-// 					onChange={(e) => updateFormData("idType", e.target.value)}
-// 					className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent'>
-// 					<option>National Identity Number</option>
-// 					<option>Driver's License</option>
-// 					<option>Passport</option>
-// 					<option>Voter's Card</option>
-// 				</select>
-// 			</div>
-
-// 			<div>
-// 				<label className='block text-sm font-medium text-gray-700 mb-2'>
-// 					Upload ID
-// 				</label>
-// 				<div className='flex items-center space-x-4'>
-// 					<label className='bg-gray-800 text-white px-4 py-2 rounded cursor-pointer hover:bg-gray-700 transition-colors'>
-// 						Choose File
-// 						<input
-// 							type='file'
-// 							accept='image/*,.pdf'
-// 							onChange={handleFileUpload}
-// 							className='hidden'
-// 						/>
-// 					</label>
-// 					<span className='text-gray-500 text-sm'>
-// 						{formData.idFile ? formData.idFile.name : "No file chosen"}
-// 					</span>
-// 				</div>
-// 				{errors.idFile && (
-// 					<p className='text-red-500 text-sm mt-1'>{errors.idFile}</p>
-// 				)}
-// 			</div>
-
-// 			<button
-// 				onClick={handleContinue}
-// 				className='w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors'>
-// 				Continue
-// 			</button>
-// 		</div>
-// 	);
-
-// 	const renderStep3 = () => (
-// 		<div className='space-y-6'>
-// 			<div className='text-center mb-6'>
-// 				<p className='text-gray-600 mb-2'>Connect to your Cardano wallet.</p>
-// 				<p className='text-gray-600'>
+// 			<div className='text-center mb-6 p-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl'>
+// 				<Wallet className='w-12 h-12 text-blue-600 mx-auto mb-3' />
+// 				<h3 className='text-lg font-semibold text-gray-900 mb-2'>
+// 					Connect Wallet
+// 				</h3>
+// 				<p className='text-gray-600 mb-4'>
+// 					Connect your Cardano wallet for seamless transactions (Optional)
+// 				</p>
+// 				<p className='text-sm text-gray-500'>
 // 					Don't have a wallet?{" "}
 // 					<button
-// 						onClick={() => router.push("/register/1")}
-// 						className='text-green-600 hover:text-green-700'>
-// 						Skip
+// 						onClick={() => handleCreateAccount()}
+// 						className='text-blue-600 hover:text-blue-700 font-medium'>
+// 						Skip this step
 // 					</button>
 // 				</p>
 // 			</div>
 
-// 			<div>
-// 				<label className='block text-sm font-medium text-gray-700 mb-2'>
-// 					Connect Wallet
+// 			<div className='bg-white border-2 border-gray-200 rounded-xl p-6'>
+// 				<label className='block text-sm font-semibold text-gray-700 mb-4'>
+// 					Connect Your Cardano Wallet
 // 				</label>
-// 				<select
-// 					value={formData.wallet}
-// 					onChange={(e) => updateFormData("wallet", e.target.value)}
-// 					className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent'>
-// 					<option value=''>Choose Wallet</option>
-// 					<option value='nami'>Nami</option>
-// 					<option value='ccvault'>CCVault</option>
-// 					<option value='yoroi'>Yoroi</option>
-// 					<option value='flint'>Flint</option>
-// 				</select>
+// 				<ConnectWallet className='w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 hover:from-purple-700 hover:to-blue-700' />
 // 			</div>
 
-// 			<button
-// 				onClick={handleContinue}
-// 				className='w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors'>
-// 				Create Account
-// 			</button>
+// 			{Object.keys(errors).length > 0 && (
+// 				<div className='bg-red-50 border-2 border-red-200 rounded-xl p-4'>
+// 					<div className='flex items-center mb-2'>
+// 						<span className='text-red-500 mr-2'>⚠</span>
+// 						<p className='text-red-600 text-sm font-semibold'>
+// 							Please fix the following errors:
+// 						</p>
+// 					</div>
+// 					<ul className='text-red-600 text-sm space-y-1 ml-6'>
+// 						{Object.entries(errors).map(([field, error]) => (
+// 							<li key={field}>• {error}</li>
+// 						))}
+// 					</ul>
+// 				</div>
+// 			)}
 
-// 			<div className='text-center'>
-// 				<button
-// 					onClick={() => router.push("/dashboard")}
-// 					className='text-gray-600 hover:text-gray-800'>
-// 					Skip
-// 				</button>
-// 			</div>
+// 			{errors.api && (
+// 				<div className='bg-red-50 border-2 border-red-200 rounded-xl p-4'>
+// 					<div className='flex items-center'>
+// 						<span className='text-red-500 mr-2'>⚠</span>
+// 						<p className='text-red-600 text-sm font-medium'>{errors.api}</p>
+// 					</div>
+// 				</div>
+// 			)}
 // 		</div>
 // 	);
 
@@ -390,8 +618,6 @@
 // 				return renderStep1();
 // 			case 2:
 // 				return renderStep2();
-// 			case 3:
-// 				return renderStep3();
 // 			default:
 // 				return renderStep1();
 // 		}
@@ -400,32 +626,74 @@
 // 	const getStepTitle = () => {
 // 		switch (currentStep) {
 // 			case 1:
-// 				return "Please fill in your details";
+// 				return "Personal Information";
 // 			case 2:
-// 				return "Enter any form of national identification";
-// 			case 3:
-// 				return "";
+// 				return "Wallet Connection";
 // 			default:
-// 				return "Please fill in your details";
+// 				return "Personal Information";
 // 		}
 // 	};
 
 // 	return (
-// 		<div className='min-h-screen bg-gray-50 flex items-center justify-center p-4'>
-// 			<div className='max-w-md w-full'>
+// 		<div className='min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center p-4'>
+// 			<div className='max-w-2xl w-full'>
 // 				{renderStepIndicator()}
 
-// 				<div className='bg-white rounded-lg shadow-lg p-8 border-2 border-blue-500'>
+// 				<div className='bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8'>
 // 					<div className='text-center mb-8'>
-// 						<h1 className='text-2xl font-bold text-gray-900 mb-2'>
+// 						<h1 className='text-3xl font-bold text-gray-900 mb-2'>
 // 							Create Account
 // 						</h1>
-// 						{getStepTitle() && (
-// 							<p className='text-gray-600'>{getStepTitle()}</p>
-// 						)}
+// 						<p className='text-gray-600 text-lg'>{getStepTitle()}</p>
 // 					</div>
 
 // 					{getStepContent()}
+
+// 					<div className='flex items-center justify-between mt-8 pt-6 border-t border-gray-200'>
+// 						{currentStep > 1 ? (
+// 							<button
+// 								onClick={handleBack}
+// 								className='px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-medium hover:border-gray-400 hover:bg-gray-50 transition-all duration-200'>
+// 								Back
+// 							</button>
+// 						) : (
+// 							<div className='text-center'>
+// 								<span className='text-gray-600'>Already have an account? </span>
+// 								<button
+// 									onClick={() => router.push("/auth/login")}
+// 									className='text-green-600 hover:text-green-700 font-semibold'>
+// 									Login
+// 								</button>
+// 							</div>
+// 						)}
+
+// 						<button
+// 							onClick={handleContinue}
+// 							disabled={isLoading}
+// 							className='px-8 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl font-semibold hover:from-green-700 hover:to-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105'>
+// 							{isLoading ? (
+// 								<span className='flex items-center'>
+// 									<div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2'></div>
+// 									Creating Account...
+// 								</span>
+// 							) : currentStep === 2 ? (
+// 								"Create Account"
+// 							) : (
+// 								"Continue"
+// 							)}
+// 						</button>
+// 					</div>
+
+// 					{currentStep === 2 && (
+// 						<div className='text-center mt-4'>
+// 							<button
+// 								onClick={() => handleCreateAccount()}
+// 								disabled={isLoading}
+// 								className='text-gray-600 hover:text-gray-800 disabled:opacity-50 text-sm'>
+// 								Skip wallet connection
+// 							</button>
+// 						</div>
+// 					)}
 // 				</div>
 // 			</div>
 // 		</div>
@@ -434,53 +702,113 @@
 
 // export default RegisterPage;
 
-// app/register/[step]/page.tsx
 "use client";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import {
+	Eye,
+	EyeOff,
+	User,
+	Mail,
+	Phone,
+	Calendar,
+	MapPin,
+	Wallet,
+	Check,
+	CheckCircle,
+	X,
+	AlertCircle,
+} from "lucide-react";
 import ConnectWallet from "@/components/global/CardanoWalletButton";
 
 interface FormData {
-	fullName: string;
+	fullname: string;
 	email: string;
 	password: string;
 	confirmPassword: string;
-	idType: string;
-	idFile: File | null;
+	birthdate: string;
+	gender: "male" | "female" | "";
+	phone: string;
+	location: string;
+	usertype: "farmer" | "buyer" | "admin";
 	wallet: string;
 }
+
+interface Toast {
+	id: string;
+	type: "success" | "error" | "info";
+	message: string;
+}
+
+const STORAGE_KEY = "registration_form_data";
 
 const RegisterPage = () => {
 	const router = useRouter();
 	const params = useParams();
 	const currentStep = parseInt(params.step as string) || 1;
 
-	const [formData, setFormData] = useState<FormData>({
-		fullName: "",
-		email: "",
-		password: "",
-		confirmPassword: "",
-		idType: "National Identity Number",
-		idFile: null,
-		wallet: "",
+	// Toast state
+	const [toasts, setToasts] = useState<Toast[]>([]);
+
+	// Initialize form data with stored data or defaults
+	const [formData, setFormData] = useState<FormData>(() => {
+		if (typeof window !== "undefined") {
+			const stored = sessionStorage.getItem(STORAGE_KEY);
+			if (stored) {
+				const parsedData = JSON.parse(stored);
+				return parsedData;
+			}
+		}
+		return {
+			fullname: "",
+			email: "",
+			password: "",
+			confirmPassword: "",
+			birthdate: "",
+			gender: "",
+			phone: "",
+			location: "",
+			usertype: "buyer",
+			wallet: "",
+		};
 	});
 
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [errors, setErrors] = useState<Record<string, string>>({});
+	const [isLoading, setIsLoading] = useState(false);
+
+	// Toast functions
+	const addToast = (type: Toast["type"], message: string) => {
+		const id = Date.now().toString();
+		const newToast: Toast = { id, type, message };
+		setToasts((prev) => [...prev, newToast]);
+
+		// Auto remove after 5 seconds
+		setTimeout(() => {
+			removeToast(id);
+		}, 5000);
+	};
+
+	const removeToast = (id: string) => {
+		setToasts((prev) => prev.filter((toast) => toast.id !== id));
+	};
+
+	// Save form data to sessionStorage whenever it changes
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+		}
+	}, [formData]);
 
 	// Redirect to step 1 if invalid step
 	useEffect(() => {
-		if (currentStep < 1 || currentStep > 3) {
-			router.replace("/register/1");
+		if (currentStep < 1 || currentStep > 2) {
+			router.replace("/auth/register/1");
 		}
 	}, [currentStep, router]);
 
-	const updateFormData = (
-		field: keyof FormData,
-		value: string | File | null
-	) => {
+	const updateFormData = (field: keyof FormData, value: string) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 		// Clear error when user starts typing
 		if (errors[field]) {
@@ -491,8 +819,8 @@ const RegisterPage = () => {
 	const validateStep1 = () => {
 		const newErrors: Record<string, string> = {};
 
-		if (!formData.fullName.trim()) {
-			newErrors.fullName = "Full name is required";
+		if (!formData.fullname.trim()) {
+			newErrors.fullname = "Full name is required";
 		}
 
 		if (!formData.email.trim()) {
@@ -511,19 +839,162 @@ const RegisterPage = () => {
 			newErrors.confirmPassword = "Passwords do not match";
 		}
 
-		setErrors(newErrors);
-		return Object.keys(newErrors).length === 0;
-	};
+		if (!formData.birthdate) {
+			newErrors.birthdate = "Birth date is required";
+		}
 
-	const validateStep2 = () => {
-		const newErrors: Record<string, string> = {};
+		if (!formData.gender) {
+			newErrors.gender = "Gender is required";
+		}
 
-		if (!formData.idFile) {
-			newErrors.idFile = "Please upload your ID document";
+		if (!formData.phone.trim()) {
+			newErrors.phone = "Phone number is required";
+		}
+
+		if (!formData.location.trim()) {
+			newErrors.location = "Location is required";
+		}
+
+		if (!formData.usertype) {
+			newErrors.usertype = "User type is required";
 		}
 
 		setErrors(newErrors);
 		return Object.keys(newErrors).length === 0;
+	};
+
+	const validateFinalSubmission = () => {
+		const newErrors: Record<string, string> = {};
+
+		// Basic required fields - check for empty strings properly
+		const requiredFields = [
+			"fullname",
+			"email",
+			"password",
+			"birthdate",
+			"gender",
+			"phone",
+			"location",
+			"usertype",
+		];
+
+		requiredFields.forEach((field) => {
+			const value = formData[field as keyof FormData];
+
+			if (!value || (typeof value === "string" && value.trim() === "")) {
+				newErrors[field] = `${
+					field.charAt(0).toUpperCase() + field.slice(1)
+				} is required`;
+			}
+		});
+
+		// Email validation
+		if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+			newErrors.email = "Please enter a valid email";
+		}
+
+		// Password validation
+		if (formData.password && formData.password.length < 8) {
+			newErrors.password = "Password must be at least 8 characters";
+		}
+
+		// Confirm password validation
+		if (formData.password !== formData.confirmPassword) {
+			newErrors.confirmPassword = "Passwords do not match";
+		}
+
+		setErrors(newErrors);
+		return Object.keys(newErrors).length === 0;
+	};
+
+	const handleCreateAccount = async () => {
+		setIsLoading(true);
+
+		// Clear any previous API errors
+		setErrors((prev) => ({ ...prev, api: "" }));
+
+		// Validate before submission
+		const validationResult = validateFinalSubmission();
+
+		if (!validationResult) {
+			setIsLoading(false);
+			addToast("error", "Please fix the validation errors before continuing");
+			return;
+		}
+
+		try {
+			// Add request timeout
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+			// Use JSON instead of FormData for better performance
+			const requestBody = {
+				fullname: formData.fullname.trim(),
+				email: formData.email.trim().toLowerCase(),
+				password: formData.password,
+				birthdate: formData.birthdate,
+				gender: formData.gender,
+				phone: formData.phone.trim(),
+				location: formData.location.trim(),
+				usertype: formData.usertype,
+				...(formData.wallet && { wallet: formData.wallet }),
+			};
+
+			addToast("info", "Creating your account...");
+
+			const response = await fetch(
+				"https://farmplace-backend-api.onrender.com/api/v1/auth/register",
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(requestBody),
+					signal: controller.signal,
+				}
+			);
+
+			clearTimeout(timeoutId);
+
+			const result = await response.json();
+
+			if (response.ok) {
+				// Registration successful
+				addToast(
+					"success",
+					"Account created successfully! Redirecting to login..."
+				);
+
+				// Clear stored data
+				if (typeof window !== "undefined") {
+					sessionStorage.removeItem(STORAGE_KEY);
+				}
+
+				// Redirect after showing success message
+				setTimeout(() => {
+					router.push("/auth/login");
+				}, 2000);
+			} else {
+				// Handle API errors
+				const errorMessage = result.message || "Registration failed";
+				setErrors({ api: errorMessage });
+				addToast("error", errorMessage);
+			}
+		} catch (error) {
+			if (error instanceof Error && error.name === "AbortError") {
+				const timeoutMessage =
+					"Request timeout. The server might be slow. Please try again.";
+				setErrors({ api: timeoutMessage });
+				addToast("error", timeoutMessage);
+			} else {
+				const networkMessage =
+					"Network error. Please check your connection and try again.";
+				setErrors({ api: networkMessage });
+				addToast("error", networkMessage);
+			}
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const handleContinue = () => {
@@ -531,53 +1002,83 @@ const RegisterPage = () => {
 
 		if (currentStep === 1) {
 			isValid = validateStep1();
+			if (isValid) {
+				router.push(`/auth/register/${currentStep + 1}`);
+			} else {
+				addToast("error", "Please fill in all required fields correctly");
+			}
 		} else if (currentStep === 2) {
-			isValid = validateStep2();
-		}
-
-		if (isValid && currentStep < 3) {
-			router.push(`/auth/register/${currentStep + 1}`);
-		} else if (currentStep === 3) {
 			// Final step - create account
 			handleCreateAccount();
 		}
 	};
 
-	const handleCreateAccount = () => {
-		// Here you would typically send the data to your API
-		console.log("Creating account with data:", formData);
-		// Redirect to success page or login
-		router.push("/dashboard");
+	const handleBack = () => {
+		if (currentStep > 1) {
+			router.push(`/auth/register/${currentStep - 1}`);
+		}
 	};
 
-	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files?.[0] || null;
-		updateFormData("idFile", file);
-	};
-
-	const handleGoogleSignIn = () => {
-		// Implement Google Sign In logic
-		console.log("Google Sign In");
-	};
+	// Toast Component
+	const ToastContainer = () => (
+		<div className='fixed top-4 right-4 z-50 space-y-2'>
+			{toasts.map((toast) => (
+				<div
+					key={toast.id}
+					className={`flex items-center p-4 rounded-lg shadow-lg border transition-all duration-300 transform translate-x-0 ${
+						toast.type === "success"
+							? "bg-green-50 border-green-200 text-green-800"
+							: toast.type === "error"
+							? "bg-red-50 border-red-200 text-red-800"
+							: "bg-blue-50 border-blue-200 text-blue-800"
+					}`}>
+					<div className='flex-shrink-0 mr-3'>
+						{toast.type === "success" && <CheckCircle size={20} />}
+						{toast.type === "error" && <AlertCircle size={20} />}
+						{toast.type === "info" && <AlertCircle size={20} />}
+					</div>
+					<div className='flex-1'>
+						<p className='text-sm font-medium'>{toast.message}</p>
+					</div>
+					<button
+						onClick={() => removeToast(toast.id)}
+						className='flex-shrink-0 ml-4 text-gray-400 hover:text-gray-600'>
+						<X size={16} />
+					</button>
+				</div>
+			))}
+		</div>
+	);
 
 	const renderStepIndicator = () => (
 		<div className='flex items-center justify-center mb-8'>
-			{[1, 2, 3].map((stepNum) => (
-				<div key={stepNum} className='flex items-center'>
-					<div
-						className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-							stepNum < currentStep
-								? "bg-green-600 text-white"
-								: stepNum === currentStep
-								? "bg-green-600 text-white"
-								: "bg-gray-200 text-gray-600"
-						}`}>
-						{stepNum < currentStep ? "✓" : stepNum}
-					</div>
-					{stepNum < 3 && (
+			{[
+				{ step: 1, label: "Details", icon: User },
+				{ step: 2, label: "Wallet", icon: Wallet },
+			].map(({ step, label, icon: Icon }, index) => (
+				<div key={step} className='flex items-center'>
+					<div className='flex flex-col items-center'>
 						<div
-							className={`w-16 h-0.5 mx-2 ${
-								stepNum < currentStep ? "bg-green-600" : "bg-gray-200"
+							className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
+								step < currentStep
+									? "bg-green-600 text-white shadow-lg"
+									: step === currentStep
+									? "bg-green-600 text-white shadow-lg scale-110"
+									: "bg-gray-200 text-gray-600"
+							}`}>
+							{step < currentStep ? <Check size={20} /> : <Icon size={20} />}
+						</div>
+						<span
+							className={`mt-2 text-xs font-medium ${
+								step <= currentStep ? "text-green-600" : "text-gray-400"
+							}`}>
+							{label}
+						</span>
+					</div>
+					{index < 1 && (
+						<div
+							className={`w-16 h-0.5 mx-4 transition-all duration-300 ${
+								step < currentStep ? "bg-green-600" : "bg-gray-200"
 							}`}
 						/>
 					)}
@@ -588,44 +1089,209 @@ const RegisterPage = () => {
 
 	const renderStep1 = () => (
 		<div className='space-y-6'>
+			<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+				<div>
+					<label className='block text-sm font-semibold text-gray-700 mb-2'>
+						<User className='inline w-4 h-4 mr-2' />
+						Full Name
+					</label>
+					<input
+						type='text'
+						value={formData.fullname}
+						onChange={(e) => updateFormData("fullname", e.target.value)}
+						placeholder='Enter your full name'
+						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 ${
+							errors.fullname
+								? "border-red-500 bg-red-50"
+								: "border-gray-200 hover:border-gray-300"
+						}`}
+					/>
+					{errors.fullname && (
+						<p className='text-red-500 text-sm mt-1 flex items-center'>
+							<span className='mr-1'>⚠</span>
+							{errors.fullname}
+						</p>
+					)}
+				</div>
+
+				<div>
+					<label className='block text-sm font-semibold text-gray-700 mb-2'>
+						<Mail className='inline w-4 h-4 mr-2' />
+						Email
+					</label>
+					<input
+						type='email'
+						value={formData.email}
+						onChange={(e) => updateFormData("email", e.target.value)}
+						placeholder='Enter your email'
+						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 ${
+							errors.email
+								? "border-red-500 bg-red-50"
+								: "border-gray-200 hover:border-gray-300"
+						}`}
+					/>
+					{errors.email && (
+						<p className='text-red-500 text-sm mt-1 flex items-center'>
+							<span className='mr-1'>⚠</span>
+							{errors.email}
+						</p>
+					)}
+				</div>
+			</div>
+
+			<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+				<div>
+					<label className='block text-sm font-semibold text-gray-700 mb-2'>
+						<Phone className='inline w-4 h-4 mr-2' />
+						Phone Number
+					</label>
+					<input
+						type='tel'
+						value={formData.phone}
+						onChange={(e) => updateFormData("phone", e.target.value)}
+						placeholder='Enter your phone number'
+						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 ${
+							errors.phone
+								? "border-red-500 bg-red-50"
+								: "border-gray-200 hover:border-gray-300"
+						}`}
+					/>
+					{errors.phone && (
+						<p className='text-red-500 text-sm mt-1 flex items-center'>
+							<span className='mr-1'>⚠</span>
+							{errors.phone}
+						</p>
+					)}
+				</div>
+
+				<div>
+					<label className='block text-sm font-semibold text-gray-700 mb-2'>
+						<Calendar className='inline w-4 h-4 mr-2' />
+						Birth Date
+					</label>
+					<input
+						type='date'
+						value={formData.birthdate}
+						onChange={(e) => updateFormData("birthdate", e.target.value)}
+						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 ${
+							errors.birthdate
+								? "border-red-500 bg-red-50"
+								: "border-gray-200 hover:border-gray-300"
+						}`}
+					/>
+					{errors.birthdate && (
+						<p className='text-red-500 text-sm mt-1 flex items-center'>
+							<span className='mr-1'>⚠</span>
+							{errors.birthdate}
+						</p>
+					)}
+				</div>
+			</div>
+
+			<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+				<div>
+					<label className='block text-sm font-semibold text-gray-700 mb-2'>
+						Gender
+					</label>
+					<select
+						value={formData.gender}
+						onChange={(e) => updateFormData("gender", e.target.value)}
+						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 ${
+							errors.gender
+								? "border-red-500 bg-red-50"
+								: "border-gray-200 hover:border-gray-300"
+						}`}>
+						<option value=''>Select Gender</option>
+						<option value='male'>Male</option>
+						<option value='female'>Female</option>
+					</select>
+					{errors.gender && (
+						<p className='text-red-500 text-sm mt-1 flex items-center'>
+							<span className='mr-1'>⚠</span>
+							{errors.gender}
+						</p>
+					)}
+				</div>
+
+				<div>
+					<label className='block text-sm font-semibold text-gray-700 mb-2'>
+						<MapPin className='inline w-4 h-4 mr-2' />
+						Location
+					</label>
+					<input
+						type='text'
+						value={formData.location}
+						onChange={(e) => updateFormData("location", e.target.value)}
+						placeholder='Enter your location'
+						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 ${
+							errors.location
+								? "border-red-500 bg-red-50"
+								: "border-gray-200 hover:border-gray-300"
+						}`}
+					/>
+					{errors.location && (
+						<p className='text-red-500 text-sm mt-1 flex items-center'>
+							<span className='mr-1'>⚠</span>
+							{errors.location}
+						</p>
+					)}
+				</div>
+			</div>
+
 			<div>
-				<label className='block text-sm font-medium text-gray-700 mb-2'>
-					Full Name
+				<label className='block text-sm font-semibold text-gray-700 mb-2'>
+					User Type
 				</label>
-				<input
-					type='text'
-					value={formData.fullName}
-					onChange={(e) => updateFormData("fullName", e.target.value)}
-					placeholder='Precious Eyo'
-					className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-						errors.fullName ? "border-red-500" : "border-gray-300"
-					}`}
-				/>
-				{errors.fullName && (
-					<p className='text-red-500 text-sm mt-1'>{errors.fullName}</p>
+				<div className='grid grid-cols-2 gap-4'>
+					{[
+						{
+							value: "buyer",
+							label: "Buyer",
+							desc: "Purchase agricultural products",
+						},
+						{
+							value: "farmer",
+							label: "Farmer",
+							desc: "Sell agricultural products",
+						},
+					].map((type) => (
+						<div
+							key={type.value}
+							onClick={() => updateFormData("usertype", type.value)}
+							className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+								formData.usertype === type.value
+									? "border-green-500 bg-green-50"
+									: "border-gray-200 hover:border-gray-300"
+							}`}>
+							<div className='flex items-center justify-between mb-2'>
+								<span className='font-semibold text-gray-900'>
+									{type.label}
+								</span>
+								<div
+									className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+										formData.usertype === type.value
+											? "border-green-500 bg-green-500"
+											: "border-gray-300"
+									}`}>
+									{formData.usertype === type.value && (
+										<div className='w-2 h-2 bg-white rounded-full' />
+									)}
+								</div>
+							</div>
+							<p className='text-sm text-gray-600'>{type.desc}</p>
+						</div>
+					))}
+				</div>
+				{errors.usertype && (
+					<p className='text-red-500 text-sm mt-1 flex items-center'>
+						<span className='mr-1'>⚠</span>
+						{errors.usertype}
+					</p>
 				)}
 			</div>
 
 			<div>
-				<label className='block text-sm font-medium text-gray-700 mb-2'>
-					Email
-				</label>
-				<input
-					type='email'
-					value={formData.email}
-					onChange={(e) => updateFormData("email", e.target.value)}
-					placeholder='Email'
-					className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-						errors.email ? "border-red-500" : "border-gray-300"
-					}`}
-				/>
-				{errors.email && (
-					<p className='text-red-500 text-sm mt-1'>{errors.email}</p>
-				)}
-			</div>
-
-			<div>
-				<label className='block text-sm font-medium text-gray-700 mb-2'>
+				<label className='block text-sm font-semibold text-gray-700 mb-2'>
 					Password
 				</label>
 				<div className='relative'>
@@ -633,25 +1299,30 @@ const RegisterPage = () => {
 						type={showPassword ? "text" : "password"}
 						value={formData.password}
 						onChange={(e) => updateFormData("password", e.target.value)}
-						placeholder='Password'
-						className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent pr-12 ${
-							errors.password ? "border-red-500" : "border-gray-300"
+						placeholder='Enter your password'
+						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 pr-12 ${
+							errors.password
+								? "border-red-500 bg-red-50"
+								: "border-gray-200 hover:border-gray-300"
 						}`}
 					/>
 					<button
 						type='button'
 						onClick={() => setShowPassword(!showPassword)}
-						className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600'>
+						className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'>
 						{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
 					</button>
 				</div>
 				{errors.password && (
-					<p className='text-red-500 text-sm mt-1'>{errors.password}</p>
+					<p className='text-red-500 text-sm mt-1 flex items-center'>
+						<span className='mr-1'>⚠</span>
+						{errors.password}
+					</p>
 				)}
 			</div>
 
 			<div>
-				<label className='block text-sm font-medium text-gray-700 mb-2'>
+				<label className='block text-sm font-semibold text-gray-700 mb-2'>
 					Confirm Password
 				</label>
 				<div className='relative'>
@@ -659,165 +1330,81 @@ const RegisterPage = () => {
 						type={showConfirmPassword ? "text" : "password"}
 						value={formData.confirmPassword}
 						onChange={(e) => updateFormData("confirmPassword", e.target.value)}
-						placeholder='Confirm Password'
-						className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent pr-12 ${
-							errors.confirmPassword ? "border-red-500" : "border-gray-300"
+						placeholder='Confirm your password'
+						className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 pr-12 ${
+							errors.confirmPassword
+								? "border-red-500 bg-red-50"
+								: "border-gray-200 hover:border-gray-300"
 						}`}
 					/>
 					<button
 						type='button'
 						onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-						className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600'>
+						className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'>
 						{showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
 					</button>
 				</div>
 				{errors.confirmPassword && (
-					<p className='text-red-500 text-sm mt-1'>{errors.confirmPassword}</p>
+					<p className='text-red-500 text-sm mt-1 flex items-center'>
+						<span className='mr-1'>⚠</span>
+						{errors.confirmPassword}
+					</p>
 				)}
 			</div>
-
-			<button
-				onClick={handleContinue}
-				className='w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors'>
-				Continue
-			</button>
-
-			<div className='text-center'>
-				<span className='text-gray-600'>Already have an account? </span>
-				<button
-					onClick={() => router.push("/login")}
-					className='text-green-600 hover:text-green-700 font-medium'>
-					Login
-				</button>
-			</div>
-
-			<div className='relative'>
-				<div className='absolute inset-0 flex items-center'>
-					<div className='w-full border-t border-gray-300' />
-				</div>
-				<div className='relative flex justify-center text-sm'>
-					<span className='px-2 bg-white text-gray-500'>Or</span>
-				</div>
-			</div>
-
-			<button
-				onClick={handleGoogleSignIn}
-				className='w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors'>
-				<svg className='w-5 h-5 mr-2' viewBox='0 0 24 24'>
-					<path
-						fill='#4285f4'
-						d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'
-					/>
-					<path
-						fill='#34a853'
-						d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'
-					/>
-					<path
-						fill='#fbbc05'
-						d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z'
-					/>
-					<path
-						fill='#ea4335'
-						d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z'
-					/>
-				</svg>
-				Continue with Google
-			</button>
 		</div>
 	);
 
 	const renderStep2 = () => (
 		<div className='space-y-6'>
-			<div>
-				<label className='block text-sm font-medium text-gray-700 mb-2'>
-					ID Type
-				</label>
-				<select
-					value={formData.idType}
-					onChange={(e) => updateFormData("idType", e.target.value)}
-					className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent'>
-					<option>National Identity Number</option>
-					<option>Driver's License</option>
-					<option>Passport</option>
-					<option>Voter's Card</option>
-				</select>
-			</div>
-
-			<div>
-				<label className='block text-sm font-medium text-gray-700 mb-2'>
-					Upload ID
-				</label>
-				<div className='flex items-center space-x-4'>
-					<label className='bg-gray-800 text-white px-4 py-2 rounded cursor-pointer hover:bg-gray-700 transition-colors'>
-						Choose File
-						<input
-							type='file'
-							accept='image/*,.pdf'
-							onChange={handleFileUpload}
-							className='hidden'
-						/>
-					</label>
-					<span className='text-gray-500 text-sm'>
-						{formData.idFile ? formData.idFile.name : "No file chosen"}
-					</span>
-				</div>
-				{errors.idFile && (
-					<p className='text-red-500 text-sm mt-1'>{errors.idFile}</p>
-				)}
-			</div>
-
-			<button
-				onClick={handleContinue}
-				className='w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors'>
-				Continue
-			</button>
-		</div>
-	);
-
-	const renderStep3 = () => (
-		<div className='space-y-6'>
-			<div className='text-center mb-6'>
-				<p className='text-gray-600 mb-2'>Connect to your Cardano wallet.</p>
-				<p className='text-gray-600'>
+			<div className='text-center mb-6 p-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl'>
+				<Wallet className='w-12 h-12 text-blue-600 mx-auto mb-3' />
+				<h3 className='text-lg font-semibold text-gray-900 mb-2'>
+					Connect Wallet
+				</h3>
+				<p className='text-gray-600 mb-4'>
+					Connect your Cardano wallet for seamless transactions (Optional)
+				</p>
+				<p className='text-sm text-gray-500'>
 					Don't have a wallet?{" "}
 					<button
-						onClick={() => router.push("/dashboard")}
-						className='text-green-600 hover:text-green-700'>
-						Skip
+						onClick={() => handleCreateAccount()}
+						className='text-blue-600 hover:text-blue-700 font-medium'>
+						Skip this step
 					</button>
 				</p>
 			</div>
 
-			<div>
-				<label className='block text-sm font-medium text-gray-700 mb-2'>
-					Connect Wallet
+			<div className='bg-white border-2 border-gray-200 rounded-xl p-6'>
+				<label className='block text-sm font-semibold text-gray-700 mb-4'>
+					Connect Your Cardano Wallet
 				</label>
-				<ConnectWallet className='w-[380px] bg-white !text-black border' />
-				{/* <select
-					value={formData.wallet}
-					onChange={(e) => updateFormData("wallet", e.target.value)}
-					className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent'>
-					<option value=''>Choose Wallet</option>
-					<option value='nami'>Nami</option>
-					<option value='ccvault'>CCVault</option>
-					<option value='yoroi'>Yoroi</option>
-					<option value='flint'>Flint</option>
-				</select> */}
+				<ConnectWallet className='w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 hover:from-purple-700 hover:to-blue-700' />
 			</div>
 
-			<button
-				onClick={handleContinue}
-				className='w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors'>
-				Create Account
-			</button>
+			{Object.keys(errors).length > 0 && (
+				<div className='bg-red-50 border-2 border-red-200 rounded-xl p-4'>
+					<div className='flex items-center mb-2'>
+						<span className='text-red-500 mr-2'>⚠</span>
+						<p className='text-red-600 text-sm font-semibold'>
+							Please fix the following errors:
+						</p>
+					</div>
+					<ul className='text-red-600 text-sm space-y-1 ml-6'>
+						{Object.entries(errors).map(([field, error]) => (
+							<li key={field}>• {error}</li>
+						))}
+					</ul>
+				</div>
+			)}
 
-			<div className='text-center'>
-				<button
-					onClick={() => router.push("/dashboard")}
-					className='text-gray-600 hover:text-gray-800'>
-					Skip
-				</button>
-			</div>
+			{errors.api && (
+				<div className='bg-red-50 border-2 border-red-200 rounded-xl p-4'>
+					<div className='flex items-center'>
+						<span className='text-red-500 mr-2'>⚠</span>
+						<p className='text-red-600 text-sm font-medium'>{errors.api}</p>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 
@@ -827,8 +1414,6 @@ const RegisterPage = () => {
 				return renderStep1();
 			case 2:
 				return renderStep2();
-			case 3:
-				return renderStep3();
 			default:
 				return renderStep1();
 		}
@@ -837,35 +1422,82 @@ const RegisterPage = () => {
 	const getStepTitle = () => {
 		switch (currentStep) {
 			case 1:
-				return "Please fill in your details";
+				return "Personal Information";
 			case 2:
-				return "Enter any form of national identification";
-			case 3:
-				return "";
+				return "Wallet Connection";
 			default:
-				return "Please fill in your details";
+				return "Personal Information";
 		}
 	};
 
 	return (
-		<div className='min-h-screen bg-gray-50 flex items-center justify-center p-4'>
-			<div className='max-w-md w-full'>
-				{renderStepIndicator()}
+		<>
+			<ToastContainer />
+			<div className='min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center p-4'>
+				<div className='max-w-2xl w-full'>
+					{renderStepIndicator()}
 
-				<div className='bg-white rounded-lg shadow-md p-8 '>
-					<div className='text-center mb-8'>
-						<h1 className='text-2xl font-bold text-gray-900 mb-2'>
-							Create Account
-						</h1>
-						{getStepTitle() && (
-							<p className='text-gray-600'>{getStepTitle()}</p>
+					<div className='bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8'>
+						<div className='text-center mb-8'>
+							<h1 className='text-3xl font-bold text-gray-900 mb-2'>
+								Create Account
+							</h1>
+							<p className='text-gray-600 text-lg'>{getStepTitle()}</p>
+						</div>
+
+						{getStepContent()}
+
+						<div className='flex items-center justify-between mt-8 pt-6 border-t border-gray-200'>
+							{currentStep > 1 ? (
+								<button
+									onClick={handleBack}
+									className='px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-medium hover:border-gray-400 hover:bg-gray-50 transition-all duration-200'>
+									Back
+								</button>
+							) : (
+								<div className='text-center'>
+									<span className='text-gray-600'>
+										Already have an account?{" "}
+									</span>
+									<button
+										onClick={() => router.push("/auth/login")}
+										className='text-green-600 hover:text-green-700 font-semibold'>
+										Login
+									</button>
+								</div>
+							)}
+
+							<button
+								onClick={handleContinue}
+								disabled={isLoading}
+								className='px-8 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl font-semibold hover:from-green-700 hover:to-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105'>
+								{isLoading ? (
+									<span className='flex items-center'>
+										<div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2'></div>
+										Creating Account...
+									</span>
+								) : currentStep === 2 ? (
+									"Create Account"
+								) : (
+									"Continue"
+								)}
+							</button>
+						</div>
+
+						{currentStep === 2 && (
+							<div className='text-center mt-4'>
+								<button
+									onClick={() => handleCreateAccount()}
+									disabled={isLoading}
+									className='text-gray-600 hover:text-gray-800 disabled:opacity-50 text-sm'>
+									Skip wallet connection
+								</button>
+							</div>
 						)}
 					</div>
-
-					{getStepContent()}
 				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 
