@@ -492,7 +492,7 @@ const LoginScreen = () => {
 
 				if (userType === "farmer") {
 					redirectPath = "/dashboard";
-					redirectMessage = "Welcome back, farmer! Redirecting to dashboard...";
+					redirectMessage = `Welcome back, Redirecting to your dashboard...`;
 				} else if (userType === "buyer") {
 					redirectPath = "/marketplace";
 					redirectMessage =
@@ -543,7 +543,7 @@ const LoginScreen = () => {
 				{toasts.map((toast) => (
 					<div
 						key={toast.id}
-						className={`max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 transform transition-all duration-300 ease-in-out ${
+						className={`w-[400px]  bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 transform transition-all duration-300 ease-in-out ${
 							toast.type === "success"
 								? "border-l-4 border-green-500"
 								: "border-l-4 border-red-500"

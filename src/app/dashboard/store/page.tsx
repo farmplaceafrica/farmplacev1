@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Spinner from "@/components/spinner";
-
+import { useRouter } from "next/navigation";
 interface StoreFormData {
 	storeName: string;
 	location: {
@@ -111,6 +111,8 @@ const EmptyStore: React.FC<EmptyStoreProps> = ({ onAddProduct, storeName }) => (
 );
 
 const FarmPlaceStoreCreation: React.FC = () => {
+	const router = useRouter();
+
 	const [currentStep, setCurrentStep] = useState<
 		"initial" | "form" | "success" | "store" | "loading"
 	>("loading");
@@ -151,7 +153,7 @@ const FarmPlaceStoreCreation: React.FC = () => {
 						method: "GET",
 						headers: {
 							"Content-Type": "application/json",
-							Authorization: token,
+							Authorization: `Bearer ${token}`, // Ensure "Bearer" is included
 						},
 					}
 				);
@@ -279,7 +281,7 @@ const FarmPlaceStoreCreation: React.FC = () => {
 	if (currentStep === "store") {
 		return (
 			<EmptyStore
-				onAddProduct={() => console.log("Add product clicked")}
+				onAddProduct={() => router.push("/dashboard/add-product")}
 				storeName={existingStore?.storeName}
 			/>
 		);
