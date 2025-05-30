@@ -107,7 +107,7 @@ interface ProductCardProps {
 	title: string;
 	description: string;
 	location: string;
-	token?: string;
+	ada?: string;
 	price: string;
 	image: string;
 	onAddToCart: (productId: string) => void;
@@ -118,7 +118,7 @@ const ProductCard = ({
 	title,
 	description,
 	location,
-	token,
+	ada,
 	price,
 	image,
 	onAddToCart,
@@ -213,14 +213,15 @@ const ProductCard = ({
 						<h3 className='text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent'>
 							{price}
 						</h3>
-						{token && (
-							<span className='text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-lg'>
-								{token}
-							</span>
-						)}
 					</div>
 					<div className='text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-lg'>
-						per kg
+						{ada ? (
+							<span className='text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent'>
+								{ada}
+							</span>
+						) : (
+							<span className='text-gray-400'>No token</span>
+						)}
 					</div>
 				</div>
 
@@ -269,7 +270,7 @@ const ProductCard = ({
 					<div className='w-5 h-5 bg-white/20 rounded-lg flex items-center justify-center group-hover/btn:scale-110 transition-transform duration-200'>
 						<Plus size={14} className='text-white' />
 					</div>
-					Add to Basket
+					Add to Cart
 					<svg
 						className='w-4 h-4 opacity-0 group-hover/btn:opacity-100 transition-all duration-200 transform translate-x-[-8px] group-hover/btn:translate-x-0'
 						fill='none'

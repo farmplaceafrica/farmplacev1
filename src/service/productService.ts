@@ -11,6 +11,7 @@ export interface Product {
 	location: string;
 	quantity: number;
 	priceNGN: string;
+	priceADA?: number;
 	images: string[];
 	userId: string;
 	createdAt: string;

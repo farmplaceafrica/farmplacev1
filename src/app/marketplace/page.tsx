@@ -1,113 +1,3 @@
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import ProductsGrid from "@/components/marketplace/product-grid"; // Adjust import path
-// import { productService, Product } from "@/service/productService"; // Adjust import path
-// import { SearchProvider } from "@/components/context/SearchContext"; // Add SearchContext import
-// import { CartProvider } from "@/components/context/CardContext"; // Adjust import path
-
-// // Transform Product to match ProductsGrid interface
-// interface GridProduct {
-// 	id: string;
-// 	title: string;
-// 	description: string;
-// 	location: string;
-// 	token?: string;
-// 	price: string;
-// 	image: string;
-// }
-
-// export default function MarketplacePage() {
-// 	const [products, setProducts] = useState<GridProduct[]>([]);
-// 	const [isLoading, setIsLoading] = useState(true);
-// 	const [error, setError] = useState<string | null>(null);
-
-// 	useEffect(() => {
-// 		const fetchProducts = async () => {
-// 			try {
-// 				const fetchedProducts = await productService.getAllProducts();
-
-// 				// Transform products to match ProductsGrid interface
-// 				const transformedProducts: GridProduct[] = fetchedProducts.map(
-// 					(product: Product) => ({
-// 						id: product._id,
-// 						title: product.productName,
-// 						description: product.description,
-// 						location: product.location,
-// 						price: `₦${product.priceNGN}`,
-// 						image: product.images[0] || "/placeholder-image.jpg",
-// 						// Add token if available in your Product interface
-// 						// token: product.token || undefined,
-// 					})
-// 				);
-
-// 				setProducts(transformedProducts);
-// 			} catch (err) {
-// 				console.error("Error fetching products:", err);
-// 				setError("Failed to load products");
-// 			} finally {
-// 				setIsLoading(false);
-// 			}
-// 		};
-
-// 		fetchProducts();
-// 	}, []);
-
-// 	if (isLoading) {
-// 		return (
-// 			<main className='min-h-screen flex items-center justify-center'>
-// 				<div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500'></div>
-// 			</main>
-// 		);
-// 	}
-
-// 	if (error) {
-// 		return (
-// 			<main className='min-h-screen flex items-center justify-center'>
-// 				<div className='text-center'>
-// 					<h2 className='text-xl font-semibold text-red-600 mb-2'>Error</h2>
-// 					<p className='text-gray-600'>{error}</p>
-// 					<button
-// 						onClick={() => window.location.reload()}
-// 						className='mt-4 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600'>
-// 						Try Again
-// 					</button>
-// 				</div>
-// 			</main>
-// 		);
-// 	}
-
-// 	return (
-// 		<CartProvider>
-// 			<SearchProvider>
-// 				<main className='min-h-screen py-6'>
-// 					<div className='max-w-7xl mx-auto'>
-// 						<div className='px-4 sm:px-6 lg:px-8 mb-8'>
-// 							<h1 className='text-3xl font-bold text-gray-900'>Marketplace</h1>
-// 						</div>
-
-// 						{!isLoading && products.length === 0 && !error ? (
-// 							<div className='text-center py-12'>
-// 								<h2 className='text-xl font-semibold text-gray-600 mb-2'>
-// 									No Products Available
-// 								</h2>
-// 								<p className='text-gray-500'>
-// 									Check back later for new products!
-// 								</p>
-// 							</div>
-// 						) : (
-// 							<ProductsGrid
-// 								products={products}
-// 								title='' // Empty since we already have the main title
-// 							/>
-// 						)}
-// 					</div>
-// 				</main>
-// 			</SearchProvider>
-// 		</CartProvider>
-// 	);
-// }
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -135,7 +25,7 @@ interface GridProduct {
 	title: string;
 	description: string;
 	location: string;
-	token?: string;
+	ada: string;
 	price: string;
 	image: string;
 	category?: string;
@@ -176,6 +66,7 @@ export default function MarketplacePage() {
 						description: product.description,
 						location: product.location,
 						price: `₦${product.priceNGN?.toLocaleString()}`,
+						ada: `₳${product.priceADA?.toLocaleString()}`,
 						priceValue: Number(product.priceNGN) || 0,
 						image: product.images[0] || "/placeholder-image.jpg",
 						category: product.category || "Other",
@@ -299,7 +190,7 @@ export default function MarketplacePage() {
 
 	if (isLoading) {
 		return (
-			<main className=' flex items-center justify-center bg-gray-50'>
+			<main className=' flex items-center justify-center h-screen bg-gray-50'>
 				<div className='text-center'>
 					<div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mx-auto mb-4'></div>
 					<p className='text-gray-600'>Loading marketplace...</p>
