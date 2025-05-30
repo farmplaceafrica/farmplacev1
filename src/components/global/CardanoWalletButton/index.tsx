@@ -1,178 +1,3 @@
-// // "use client";
-// // import { useState, useEffect } from "react";
-// // import { useWallet, useWalletList, useAddress } from "@meshsdk/react";
-// // import Image from "next/image";
-
-// // interface Wallet {
-// // 	name: string;
-// // 	icon: string;
-// // }
-
-// // const ConnectWallet = () => {
-// // 	const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
-// // 	const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-// // 	const { connect, disconnect, connecting, connected, wallet } = useWallet();
-// // 	const wallets = useWalletList();
-// // 	const address = useAddress();
-
-// // 	// Directly get the address from wallet object as an alternative
-// // 	const [walletAddress, setWalletAddress] = useState<string | null>(null);
-
-// // 	useEffect(() => {
-// // 		console.log("Wallets available:", wallets);
-// // 		console.log("Connected:", connected);
-// // 		console.log("Address from useAddress:", address || "Address not available");
-
-// // 		// Try to get address directly from the wallet object
-// // 		if (connected && wallet) {
-// // 			wallet
-// // 				.getUsedAddresses()
-// // 				.then((addresses) => {
-// // 					if (addresses && addresses.length > 0) {
-// // 						console.log("Address from wallet.getUsedAddresses:", addresses[0]);
-// // 						setWalletAddress(addresses[0]);
-// // 					}
-// // 				})
-// // 				.catch((err) => {
-// // 					console.error("Error getting addresses:", err);
-// // 				});
-
-// // 			// Alternative way to get the address
-// // 			wallet
-// // 				.getChangeAddress()
-// // 				.then((addr) => {
-// // 					console.log("Address from wallet.getChangeAddress:", addr);
-// // 					if (!walletAddress) {
-// // 						setWalletAddress(addr);
-// // 					}
-// // 				})
-// // 				.catch((err) => {
-// // 					console.error("Error getting change address:", err);
-// // 				});
-// // 		}
-// // 	}, [wallets, connected, address, wallet]);
-
-// // 	useEffect(() => {
-// // 		const storedWallet = localStorage.getItem("selectedWallet");
-// // 		if (storedWallet) {
-// // 			const parsedWallet = JSON.parse(storedWallet) as Wallet;
-// // 			setSelectedWallet(parsedWallet);
-// // 			connect(parsedWallet.name).catch((err) =>
-// // 				console.error("Failed to reconnect wallet:", err)
-// // 			);
-// // 		}
-// // 	}, [connect]);
-
-// // 	const handleWalletSelection = (wallet: Wallet): void => {
-// // 		// If we already have a wallet connected, disconnect it first
-// // 		if (connected && selectedWallet) {
-// // 			disconnect();
-// // 			// Small delay to ensure the wallet is fully disconnected before connecting to the new one
-// // 			setTimeout(() => {
-// // 				localStorage.setItem("selectedWallet", JSON.stringify(wallet));
-// // 				setSelectedWallet(wallet);
-// // 				connect(wallet.name).catch((err) =>
-// // 					console.error("Wallet connection failed:", err)
-// // 				);
-// // 			}, 300);
-// // 		} else {
-// // 			localStorage.setItem("selectedWallet", JSON.stringify(wallet));
-// // 			setSelectedWallet(wallet);
-// // 			connect(wallet.name).catch((err) =>
-// // 				console.error("Wallet connection failed:", err)
-// // 			);
-// // 		}
-// // 		setIsDropdownOpen(false);
-// // 	};
-
-// // 	const handleDisconnect = (): void => {
-// // 		localStorage.removeItem("selectedWallet");
-// // 		setSelectedWallet(null);
-// // 		setWalletAddress(null);
-// // 		disconnect();
-// // 	};
-
-// // 	const toggleDropdown = (): void => {
-// // 		setIsDropdownOpen(!isDropdownOpen);
-// // 	};
-
-// // 	// Close dropdown if clicked outside
-// // 	useEffect(() => {
-// // 		function handleClickOutside(event: MouseEvent) {
-// // 			if (isDropdownOpen && event.target instanceof Element) {
-// // 				const dropdown = document.querySelector(".wallet-dropdown");
-// // 				if (dropdown && !dropdown.contains(event.target)) {
-// // 					setIsDropdownOpen(false);
-// // 				}
-// // 			}
-// // 		}
-
-// // 		document.addEventListener("mousedown", handleClickOutside);
-// // 		return () => {
-// // 			document.removeEventListener("mousedown", handleClickOutside);
-// // 		};
-// // 	}, [isDropdownOpen]);
-
-// // 	// Format address for display (truncate it)
-// // 	const formatAddress = (addr: string): string => {
-// // 		if (!addr) return "";
-// // 		return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-// // 	};
-
-// // 	// Button text based on connection state
-// // 	const getButtonText = (): string => {
-// // 		if (connecting) {
-// // 			return "Connecting...";
-// // 		} else if (connected) {
-// // 			// Try to use any available address source
-// // 			const displayAddress = address || walletAddress;
-// // 			if (displayAddress) {
-// // 				return `${selectedWallet?.name}: ${formatAddress(displayAddress)}`;
-// // 			}
-// // 			return `${selectedWallet?.name}: Connected`;
-// // 		} else if (selectedWallet) {
-// // 			return `Disconnect ${selectedWallet.name}`;
-// // 		} else {
-// // 			return "Connect Wallet";
-// // 		}
-// // 	};
-
-// // 	return (
-// // 		<div className='relative'>
-// // 			<button
-// // 				onClick={selectedWallet ? handleDisconnect : toggleDropdown}
-// // 				className='px-4 py-2 bg-green-600 text-white rounded-lg'>
-// // 				{getButtonText()}
-// // 			</button>
-
-// // 			{isDropdownOpen && !selectedWallet && !connecting && (
-// // 				<div className='absolute bg-white border rounded-lg shadow-lg p-4'>
-// // 					<h3>Select a Wallet</h3>
-// // 					<ul>
-// // 						{wallets.map((wallet) => (
-// // 							<li
-// // 								key={wallet.name}
-// // 								className='cursor-pointer p-2 hover:bg-gray-100'
-// // 								onClick={() => handleWalletSelection(wallet)}>
-// // 								<Image
-// // 									src={wallet.icon}
-// // 									alt={wallet.name}
-// // 									width={24}
-// // 									height={24}
-// // 									className='inline-block mr-2'
-// // 								/>
-// // 								{wallet.name}
-// // 							</li>
-// // 						))}
-// // 					</ul>
-// // 				</div>
-// // 			)}
-// // 		</div>
-// // 	);
-// // };
-
-// // export default ConnectWallet;
-
 // "use client";
 // import { useState, useEffect } from "react";
 // import { useWallet, useWalletList, useAddress } from "@meshsdk/react";
@@ -182,6 +7,11 @@
 // 	name: string;
 // 	icon: string;
 // 	downloadUrl?: string;
+// }
+
+// interface ConnectWalletProps {
+// 	className?: string;
+// 	onConnect?: (address: string) => void;
 // }
 
 // // Default wallet download URLs
@@ -195,13 +25,7 @@
 // 	lace: "https://www.lace.io",
 // };
 
-// const ConnectWallet = ({
-// 	className,
-// 	onConnect,
-// }: {
-// 	className?: string;
-// 	onConnect?: (address: string) => void;
-// }) => {
+// const ConnectWallet = ({ className, onConnect }: ConnectWalletProps) => {
 // 	const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
 // 	const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 // 	const { connect, disconnect, connecting, connected, wallet } = useWallet();
@@ -233,17 +57,19 @@
 // 		console.log("Wallets available:", wallets);
 // 		console.log("Connected:", connected);
 // 		console.log("Address from useAddress:", address || "Address not available");
-// 		onConnect?.(address || walletAddress || "");
 
 // 		// Try to get address directly from the wallet object
 // 		if (connected && wallet) {
 // 			wallet
 // 				.getUsedAddresses()
-
 // 				.then((addresses) => {
 // 					if (addresses && addresses.length > 0) {
 // 						console.log("Address from wallet.getUsedAddresses:", addresses[0]);
 // 						setWalletAddress(addresses[0]);
+// 						// Call onConnect callback when address is available
+// 						if (onConnect) {
+// 							onConnect(addresses[0]);
+// 						}
 // 					}
 // 				})
 // 				.catch((err) => {
@@ -257,13 +83,22 @@
 // 					console.log("Address from wallet.getChangeAddress:", addr);
 // 					if (!walletAddress) {
 // 						setWalletAddress(addr);
+// 						// Call onConnect callback if we haven't already called it with a used address
+// 						if (onConnect && !address) {
+// 							onConnect(addr);
+// 						}
 // 					}
 // 				})
 // 				.catch((err) => {
 // 					console.error("Error getting change address:", err);
 // 				});
 // 		}
-// 	}, [wallets, connected, address, wallet, walletAddress]);
+
+// 		// Also handle the case where useAddress hook provides the address directly
+// 		if (connected && address && onConnect) {
+// 			onConnect(address);
+// 		}
+// 	}, [wallets, connected, address, wallet, walletAddress, onConnect]);
 
 // 	useEffect(() => {
 // 		const storedWallet = localStorage.getItem("selectedWallet");
@@ -280,7 +115,6 @@
 // 		// If we already have a wallet connected, disconnect it first
 // 		if (connected && selectedWallet) {
 // 			disconnect();
-
 // 			// Small delay to ensure the wallet is fully disconnected before connecting to the new one
 // 			setTimeout(() => {
 // 				localStorage.setItem("selectedWallet", JSON.stringify(wallet));
@@ -409,25 +243,6 @@
 // 					</svg>
 // 				)}
 // 			</button>
-
-// 			{/* Connected wallet info - shows below the button when connected */}
-// 			{/* {connected && selectedWallet && (
-// 				<div className='mt-2 bg-white border border-green-100 rounded-lg p-2 text-xs text-gray-600 shadow-sm'>
-// 					<div className='flex items-center mb-1'>
-// 						<Image
-// 							src={selectedWallet.icon}
-// 							alt={selectedWallet.name}
-// 							width={16}
-// 							height={16}
-// 							className='mr-1'
-// 						/>
-// 						<span className='font-medium'>{selectedWallet.name}</span>
-// 					</div>
-// 					<div className='truncate max-w-[200px]'>
-// 						{address || walletAddress || "Address not available"}
-// 					</div>
-// 				</div>
-// 			)} */}
 
 // 			{/* Wallet selection dropdown */}
 // 			{isDropdownOpen && (
@@ -560,6 +375,8 @@
 
 // export default ConnectWallet;
 
+// Updated ConnectWallet component with improved onConnect handling
+
 "use client";
 import { useState, useEffect } from "react";
 import { useWallet, useWalletList, useAddress } from "@meshsdk/react";
@@ -596,6 +413,7 @@ const ConnectWallet = ({ className, onConnect }: ConnectWalletProps) => {
 	const [walletAddress, setWalletAddress] = useState<string | null>(null);
 	const [showNoWalletsMessage, setShowNoWalletsMessage] =
 		useState<boolean>(false);
+	const [hasCalledOnConnect, setHasCalledOnConnect] = useState<boolean>(false);
 
 	// Enhanced wallet list with download URLs
 	const enhancedWallets = wallets.map((wallet) => ({
@@ -615,52 +433,82 @@ const ConnectWallet = ({ className, onConnect }: ConnectWalletProps) => {
 		}
 	}, [wallets]);
 
+	// Handle wallet connection and address retrieval
 	useEffect(() => {
 		console.log("Wallets available:", wallets);
 		console.log("Connected:", connected);
 		console.log("Address from useAddress:", address || "Address not available");
 
-		// Try to get address directly from the wallet object
-		if (connected && wallet) {
-			wallet
-				.getUsedAddresses()
-				.then((addresses) => {
-					if (addresses && addresses.length > 0) {
-						console.log("Address from wallet.getUsedAddresses:", addresses[0]);
-						setWalletAddress(addresses[0]);
-						// Call onConnect callback when address is available
-						if (onConnect) {
-							onConnect(addresses[0]);
-						}
-					}
-				})
-				.catch((err) => {
-					console.error("Error getting addresses:", err);
-				});
-
-			// Alternative way to get the address
-			wallet
-				.getChangeAddress()
-				.then((addr) => {
-					console.log("Address from wallet.getChangeAddress:", addr);
-					if (!walletAddress) {
+		if (connected && wallet && !hasCalledOnConnect) {
+			// Try multiple methods to get the wallet address
+			const getWalletAddress = async () => {
+				try {
+					// Method 1: Get used addresses
+					const usedAddresses = await wallet.getUsedAddresses();
+					if (usedAddresses && usedAddresses.length > 0) {
+						const addr = usedAddresses[0];
+						console.log("Address from wallet.getUsedAddresses:", addr);
 						setWalletAddress(addr);
-						// Call onConnect callback if we haven't already called it with a used address
-						if (onConnect && !address) {
+						if (onConnect && !hasCalledOnConnect) {
 							onConnect(addr);
+							setHasCalledOnConnect(true);
+						}
+						return;
+					}
+
+					// Method 2: Get change address
+					const changeAddr = await wallet.getChangeAddress();
+					if (changeAddr) {
+						console.log("Address from wallet.getChangeAddress:", changeAddr);
+						setWalletAddress(changeAddr);
+						if (onConnect && !hasCalledOnConnect) {
+							onConnect(changeAddr);
+							setHasCalledOnConnect(true);
+						}
+						return;
+					}
+
+					// Method 3: Use address from useAddress hook
+					if (address) {
+						console.log("Using address from useAddress hook:", address);
+						setWalletAddress(address);
+						if (onConnect && !hasCalledOnConnect) {
+							onConnect(address);
+							setHasCalledOnConnect(true);
 						}
 					}
-				})
-				.catch((err) => {
-					console.error("Error getting change address:", err);
-				});
+				} catch (error) {
+					console.error("Error getting wallet address:", error);
+				}
+			};
+
+			getWalletAddress();
 		}
 
-		// Also handle the case where useAddress hook provides the address directly
-		if (connected && address && onConnect) {
-			onConnect(address);
+		// Handle direct address from useAddress hook
+		if (connected && address && !hasCalledOnConnect && !walletAddress) {
+			console.log("Using direct address from useAddress:", address);
+			setWalletAddress(address);
+			if (onConnect) {
+				onConnect(address);
+				setHasCalledOnConnect(true);
+			}
 		}
-	}, [wallets, connected, address, wallet, walletAddress, onConnect]);
+
+		// Reset flag when disconnected
+		if (!connected) {
+			setHasCalledOnConnect(false);
+			setWalletAddress(null);
+		}
+	}, [
+		wallets,
+		connected,
+		address,
+		wallet,
+		walletAddress,
+		onConnect,
+		hasCalledOnConnect,
+	]);
 
 	useEffect(() => {
 		const storedWallet = localStorage.getItem("selectedWallet");
@@ -674,6 +522,9 @@ const ConnectWallet = ({ className, onConnect }: ConnectWalletProps) => {
 	}, [connect]);
 
 	const handleWalletSelection = (wallet: Wallet): void => {
+		// Reset connection flag when selecting a new wallet
+		setHasCalledOnConnect(false);
+
 		// If we already have a wallet connected, disconnect it first
 		if (connected && selectedWallet) {
 			disconnect();
@@ -699,6 +550,7 @@ const ConnectWallet = ({ className, onConnect }: ConnectWalletProps) => {
 		localStorage.removeItem("selectedWallet");
 		setSelectedWallet(null);
 		setWalletAddress(null);
+		setHasCalledOnConnect(false);
 		disconnect();
 	};
 
@@ -767,7 +619,7 @@ const ConnectWallet = ({ className, onConnect }: ConnectWalletProps) => {
 			{/* Main wallet button */}
 			<button
 				onClick={connected ? handleDisconnect : toggleDropdown}
-				className={`px-4 py-2 bg-[#2A602C] cursor-pointer  text-white rounded-lg  transition-all duration-200 flex items-center justify-center ${className}`}>
+				className={`px-4 py-2 bg-[#2A602C] cursor-pointer text-white rounded-lg transition-all duration-200 flex items-center justify-center ${className}`}>
 				{connecting && (
 					<svg
 						className='animate-spin -ml-1 mr-2 h-4 w-4 text-white'

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import Icons from "@/components/icons";
 import Image from "next/image";
-
+import { useRouter } from "next/navigation";
 // FAQ Accordion Component
 const FAQAccordion = () => {
 	const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -80,6 +80,10 @@ const FAQAccordion = () => {
 
 // FarmPlace CTA Component
 const FarmPlaceCTA = () => {
+	const router = useRouter();
+	const handleGetStarted = () => {
+		router.push("auth/register/1");
+	};
 	return (
 		<div className='max-w-6xl mx-auto px-4 py-8'>
 			<div className='relative bg-[#2A602C] rounded-3xl overflow-hidden'>
@@ -129,7 +133,9 @@ const FarmPlaceCTA = () => {
 					</div>
 
 					{/* CTA Button */}
-					<button className='bg-[#4CAF50] cursor-pointer hover:bg-green-400 text-white font-semibold px-10 py-4 rounded-full transition-colors duration-200 text-lg shadow-lg'>
+					<button
+						onClick={handleGetStarted}
+						className='bg-[#4CAF50] cursor-pointer hover:bg-green-400 text-white font-semibold px-10 py-4 rounded-full transition-colors duration-200 text-lg shadow-lg'>
 						Get Started
 					</button>
 				</div>
