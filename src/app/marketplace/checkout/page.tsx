@@ -21,6 +21,8 @@ const Checkout = () => {
 	const [isPaying, setIsPaying] = useState(false);
 	const [txStatus, setTxStatus] = useState<string | null>(null);
 	const [adaSummary, setAdaSummary] = useState({ subtotal: 0, shipping: 0, discount: 0, total: 0 });
+	const [showTxModal, setShowTxModal] = useState(false);
+	const [txHash, setTxHash] = useState<string | null>(null);
 
 	// Contact information
 	const [contactData, setContactData] = useState({
@@ -178,8 +180,10 @@ const Checkout = () => {
 			}
 			const unsignedTx = await tx.build();
 			const signedTx = await wallet.signTx(unsignedTx);
-			const txHash = await wallet.submitTx(signedTx);
-			setTxStatus(`Payment sent! Tx Hash: ${txHash}`);
+			const txHashVal = await wallet.submitTx(signedTx);
+			setTxHash(txHashVal);
+			setTxStatus(`Payment sent! Tx Hash: ${txHashVal}`);
+			setShowTxModal(true);
 			clearCart();
 		} catch (err: any) {
 			setTxStatus("Transaction failed. " + (err?.message || err));
@@ -613,11 +617,34 @@ const Checkout = () => {
 									className='w-full bg-gradient-to-r from-green-700 to-green-800 text-white py-4 px-6 rounded-xl font-semibold hover:from-green-800 hover:to-green-900 transition-all duration-200 transform hover:scale-[1.02] shadow-lg'>
 									{isPaying ? "Processing Payment..." : "Pay with ADA"}
 								</button>
-								{txStatus && (
+								{txStatus && !showTxModal && (
 									<div className={`text-center text-sm ${txStatus.startsWith("Payment sent") ? "text-green-600" : "text-red-600"}`}>{txStatus}</div>
 								)}
 							</div>
-
+							{/* Transaction Success Modal */}
+							{showTxModal && txHash && (
+								<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+									<div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center relative">
+										<h2 className="text-2xl font-bold text-green-700 mb-4">Payment Successful!</h2>
+										<p className="text-gray-700 mb-2">Your Cardano transaction was sent.</p>
+										<div className="bg-gray-100 rounded-lg p-4 mb-4 break-all text-xs text-gray-800 flex items-center justify-between">
+											<span className="truncate">{txHash}</span>
+											<button
+												onClick={() => {navigator.clipboard.writeText(txHash);}}
+												className="ml-2 px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-semibold"
+											>
+												Copy
+											</button>
+										</div>
+										<button
+											onClick={() => setShowTxModal(false)}
+											className="w-full mt-2 py-2 px-4 rounded-lg bg-green-700 text-white font-semibold hover:bg-green-800 transition-all"
+										>
+											Close
+										</button>
+									</div>
+								</div>
+							)}
 							<div className='flex items-center justify-center mt-4 text-sm text-gray-500'>
 								<svg
 									className='w-4 h-4 mr-2'
