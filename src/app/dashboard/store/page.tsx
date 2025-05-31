@@ -4,6 +4,14 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Spinner from "@/components/spinner";
 import { useRouter } from "next/navigation";
+import Icons from "@/components/icons";
+
+interface ProductImage {
+	file: File;
+	preview: string;
+	id: string;
+}
+
 interface StoreFormData {
 	storeName: string;
 	location: {
@@ -23,12 +31,93 @@ interface Store {
 		address: string;
 	};
 	description: string;
-	// Add other store properties as needed
+}
+
+interface Product {
+	id: string;
+	productName: string;
+	description: string;
+	location: string;
+	priceNGN: string;
+	priceADA: number;
+	mainImage: ProductImage | null;
 }
 
 interface SuccessModalProps {
 	onGoToStore: () => void;
 }
+
+interface UploadedProductCardProps {
+	id: string;
+	productName: string;
+	description: string;
+	location: string;
+	priceNGN: string;
+	priceADA: Number;
+	mainImage: ProductImage | null;
+	onAddToCart?: (productId: string) => void;
+}
+
+const UploadedProductCard: React.FC<UploadedProductCardProps> = ({
+	id,
+	productName,
+	description,
+	location,
+	priceNGN,
+	priceADA,
+	mainImage,
+	onAddToCart,
+}) => {
+	// price !== undefined && price !== null ? price.toLocaleString() : "0";
+	return (
+		<div className='bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow'>
+			<div className='relative h-48 w-full'>
+				{mainImage && (
+					<Image
+						src={mainImage.preview}
+						alt={productName}
+						fill
+						className='object-cover'
+					/>
+				)}
+			</div>
+			<div className='p-4'>
+				<h3 className='font-semibold text-gray-900 mb-2 text-lg'>
+					{productName}
+				</h3>
+				<p className='text-gray-600 text-sm mb-2 line-clamp-2'>{description}</p>
+				<div className='flex items-center text-gray-500 text-sm mb-3'>
+					<svg
+						className='w-4 h-4 mr-1'
+						fill='none'
+						stroke='currentColor'
+						viewBox='0 0 24 24'>
+						<path
+							strokeLinecap='round'
+							strokeLinejoin='round'
+							strokeWidth={2}
+							d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z'
+						/>
+						<path
+							strokeLinecap='round'
+							strokeLinejoin='round'
+							strokeWidth={2}
+							d='M15 11a3 3 0 11-6 0 3 3 0 016 0z'
+						/>
+					</svg>
+					{location}
+				</div>
+				<div className='flex items-center justify-between'>
+					<span className='text-2xl font-bold text-green-600'>₦{priceNGN}</span>
+					<Icons.Swap className='inline-block mx-2 text-gray-400' />
+					<span className='text-2xl font-bold text-green-600'>
+						{priceADA.toString()}
+					</span>
+				</div>
+			</div>
+		</div>
+	);
+};
 
 const SuccessModal: React.FC<SuccessModalProps> = ({ onGoToStore }) => (
 	<div className='fixed inset-0 bg-black/30  bg-opacity-50 flex items-center justify-center z-50'>
@@ -110,6 +199,99 @@ const EmptyStore: React.FC<EmptyStoreProps> = ({ onAddProduct, storeName }) => (
 	</div>
 );
 
+interface StoreWithProductsProps {
+	onAddProduct: () => void;
+	storeName?: string;
+	products: Product[];
+	isLoadingProducts: boolean;
+}
+
+const StoreWithProducts: React.FC<StoreWithProductsProps> = ({
+	onAddProduct,
+	storeName,
+	products,
+	isLoadingProducts,
+}) => {
+	const handleAddToCart = (productId: string) => {
+		// Implement add to cart functionality
+		console.log("Adding product to cart:", productId);
+	};
+
+	return (
+		<div className='min-h-screen bg-gray-50'>
+			<div className='bg-white shadow-sm'>
+				<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+					<div className='flex justify-between items-center py-4'>
+						<h1 className='text-xl font-medium text-gray-900'>
+							{storeName ? `${storeName}` : "Your Store"}
+						</h1>
+						<button
+							onClick={onAddProduct}
+							className='bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors'>
+							Add Product
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+				{isLoadingProducts ? (
+					<div className='flex justify-center items-center h-64'>
+						<Spinner />
+					</div>
+				) : products.length === 0 ? (
+					<div className='text-center py-16'>
+						<div className='mb-8'>
+							<Image
+								src='/assets/images/basket.png'
+								alt='Empty basket'
+								width={120}
+								height={120}
+								className='mx-auto'
+							/>
+						</div>
+						<h2 className='text-2xl font-medium text-gray-900 mb-4'>
+							Your store is empty.
+						</h2>
+						<p className='text-gray-600'>
+							Click on "add product" to add
+							<br />
+							product to your store
+						</p>
+					</div>
+				) : (
+					<div>
+						<div className='mb-6'>
+							<h2 className='text-2xl font-semibold text-gray-900'>
+								Your Products
+							</h2>
+							<p className='text-gray-600 mt-1'>
+								{products.length} product{products.length !== 1 ? "s" : ""} in
+								your store
+							</p>
+						</div>
+						<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+							{products.map((product) => (
+								<UploadedProductCard
+									key={product.id}
+									id={product.id}
+									productName={product.productName}
+									description={product.description}
+									location={product.location}
+									priceNGN={product.priceNGN}
+									priceADA={product.priceADA}
+									mainImage={product.mainImage}
+									onAddToCart={handleAddToCart}
+								/>
+							))}
+						</div>
+					</div>
+				)}
+			</div>
+		</div>
+	);
+};
+
 const FarmPlaceStoreCreation: React.FC = () => {
 	const router = useRouter();
 
@@ -128,6 +310,8 @@ const FarmPlaceStoreCreation: React.FC = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [existingStore, setExistingStore] = useState<Store | null>(null);
+	const [products, setProducts] = useState<Product[]>([]);
+	const [isLoadingProducts, setIsLoadingProducts] = useState(false);
 
 	// Check if user has an existing store on component mount
 	useEffect(() => {
@@ -170,8 +354,14 @@ const FarmPlaceStoreCreation: React.FC = () => {
 							(Array.isArray(result) && result.length > 0))
 					) {
 						const store = result.data || result.store || result[0];
+						console.log("Existing store found:", store);
+
+						const storeId = store._id;
 						setExistingStore(store);
 						setCurrentStep("store");
+
+						// Fetch products for this store owner
+						await fetchProducts(storeId);
 					} else {
 						setCurrentStep("initial");
 					}
@@ -262,6 +452,49 @@ const FarmPlaceStoreCreation: React.FC = () => {
 		}
 	};
 
+	// Fetch products for the store owner
+	const fetchProducts = async (storeId: string) => {
+		setIsLoadingProducts(true);
+		try {
+			const response = await fetch(
+				`https://farmplace-backend-api.onrender.com/api/v1/farmstore/owner/${storeId}/products`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			if (response.ok) {
+				const result = await response.json();
+				// Adjust based on your API response structure
+				const productsData = result.data || result.products || result || [];
+				setProducts(Array.isArray(productsData) ? productsData : []);
+			} else {
+				console.error("Failed to fetch products");
+				setProducts([]);
+			}
+		} catch (err) {
+			console.error("Error fetching products:", err);
+			setProducts([]);
+		} finally {
+			setIsLoadingProducts(false);
+		}
+	};
+
+	const handleGoToStore = async () => {
+		setCurrentStep("store");
+
+		// Fetch products when going to store
+		const userData = localStorage.getItem("user_data");
+		if (userData) {
+			const parsedUserData = JSON.parse(userData);
+			const ownerId = parsedUserData._id;
+			await fetchProducts(ownerId);
+		}
+	};
+
 	const isFormValid =
 		formData.storeName.trim() !== "" &&
 		formData.location.state.trim() !== "" &&
@@ -280,9 +513,11 @@ const FarmPlaceStoreCreation: React.FC = () => {
 
 	if (currentStep === "store") {
 		return (
-			<EmptyStore
+			<StoreWithProducts
 				onAddProduct={() => router.push("/dashboard/add-product")}
 				storeName={existingStore?.storeName}
+				products={products}
+				isLoadingProducts={isLoadingProducts}
 			/>
 		);
 	}
@@ -425,7 +660,7 @@ const FarmPlaceStoreCreation: React.FC = () => {
 
 			{/* Success Modal */}
 			{currentStep === "success" && (
-				<SuccessModal onGoToStore={() => setCurrentStep("store")} />
+				<SuccessModal onGoToStore={handleGoToStore} />
 			)}
 		</div>
 	);
