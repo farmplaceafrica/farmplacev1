@@ -138,7 +138,7 @@ const Checkout = () => {
 						id: item.id,
 						name: item.title,
 						priceAda,
-						vendorAddress: process.env.NEXT_PUBLIC_RECEIVER_ADDRESS || "addr1q9vendoraddressreplacewithreal",
+						vendorAddress: process.env.NEXT_PUBLIC_RECEIVER_ADDRESS || "addr_test1qqxaclytxrwjp9r2l8mvg26klluhhl46ntml6w6r2ltzn22tdect906dcxt8e0d3mqlcdne7n3w8jqaudjujgvz5xzzqff45vn",
 						quantity: item.quantity,
 					};
 				})
@@ -579,7 +579,7 @@ const Checkout = () => {
 									disabled={isPaying}
 									onClick={handlePayWithCardano}
 									className='w-full bg-gradient-to-r from-green-700 to-green-800 text-white py-4 px-6 rounded-xl font-semibold hover:from-green-800 hover:to-green-900 transition-all duration-200 transform hover:scale-[1.02] shadow-lg'>
-									{isPaying ? "Processing Payment..." : "Pay with Cardano"}
+									{isPaying ? "Processing Payment..." : "Pay with ADA"}
 								</button>
 								{txStatus && (
 									<div className={`text-center text-sm ${txStatus.startsWith("Payment sent") ? "text-green-600" : "text-red-600"}`}>{txStatus}</div>
