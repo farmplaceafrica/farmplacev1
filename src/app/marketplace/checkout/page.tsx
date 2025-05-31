@@ -4,16 +4,22 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/context/CardContext";
+import { createSingleVendorTransaction, convertNGNtoADA } from "@/utils";
+import { useWallet } from "@meshsdk/react";
 
 const Checkout = () => {
 	const { cartItems, clearCart } = useCart();
 	const router = useRouter();
+	const { connected, wallet } = useWallet();
 	const [couponCode, setCouponCode] = useState("");
 	const [discountAmount, setDiscountAmount] = useState(0);
 	const [appliedDiscount, setAppliedDiscount] = useState(false);
 	const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [shippingMethod, setShippingMethod] = useState("economy");
+	const [isPaying, setIsPaying] = useState(false);
+	const [txStatus, setTxStatus] = useState<string | null>(null);
+	const [adaSummary, setAdaSummary] = useState({ subtotal: 0, shipping: 0, discount: 0, total: 0 });
 
 	// Contact information
 	const [contactData, setContactData] = useState({
@@ -96,6 +102,60 @@ const Checkout = () => {
 		router.push("/marketplace");
 	};
 
+	// Calculate prices
+	const subtotal = calculateSubtotal();
+	const shippingCost = shippingMethod === "standard" ? 10000 : 5000;
+	const total = subtotal + shippingCost - discountAmount;
+
+	// Update ADA summary when prices change
+	useEffect(() => {
+		(async () => {
+			const [subtotalAda, shippingAda, discountAda, totalAda] = await Promise.all([
+				convertNGNtoADA(subtotal),
+				convertNGNtoADA(shippingCost),
+				convertNGNtoADA(discountAmount),
+				convertNGNtoADA(total),
+			]);
+			setAdaSummary({ subtotal: subtotalAda, shipping: shippingAda, discount: discountAda, total: totalAda });
+		})();
+	}, [subtotal, shippingCost, discountAmount, total]);
+
+	// Cardano payment handler
+	const handlePayWithCardano = async () => {
+		if (!wallet || !connected) {
+			setTxStatus("Please connect your Cardano wallet first.");
+			return;
+		}
+		setIsPaying(true);
+		setTxStatus(null);
+		try {
+			// Prepare cart for single vendor transaction
+			const adaCart = await Promise.all(
+				cartItems.map(async (item) => {
+					const price = parseFloat(item.price.replace(/[^\d.-]/g, ""));
+					const priceAda = await convertNGNtoADA(price);
+					return {
+						id: item.id,
+						name: item.title,
+						priceAda,
+						vendorAddress: process.env.NEXT_PUBLIC_RECEIVER_ADDRESS || "addr1q9vendoraddressreplacewithreal",
+						quantity: item.quantity,
+					};
+				})
+			);
+			const tx = createSingleVendorTransaction(adaCart, wallet);
+			const unsignedTx = await tx.build();
+			const signedTx = await wallet.signTx(unsignedTx);
+			const txHash = await wallet.submitTx(signedTx);
+			setTxStatus(`Payment sent! Tx Hash: ${txHash}`);
+			clearCart();
+		} catch (err: any) {
+			setTxStatus("Transaction failed. " + (err?.message || err));
+		} finally {
+			setIsPaying(false);
+		}
+	};
+
 	if (isLoading) {
 		return (
 			<div className='min-h-screen bg-gray-50 flex items-center justify-center'>
@@ -137,10 +197,6 @@ const Checkout = () => {
 			</div>
 		);
 	}
-
-	const subtotal = calculateSubtotal();
-	const shippingCost = shippingMethod === "standard" ? 10000 : 5000;
-	const total = subtotal + shippingCost - discountAmount;
 
 	return (
 		<div className='min-h-screen bg-gray-50'>
@@ -486,30 +542,49 @@ const Checkout = () => {
 							<div className='space-y-3 py-4 border-t border-gray-200'>
 								<div className='flex justify-between text-gray-600'>
 									<span>Subtotal</span>
-									<span>{formatPrice(subtotal)}</span>
+									<span>
+										{formatPrice(subtotal)}
+										<span className="ml-2 text-xs text-emerald-700 font-semibold">({adaSummary.subtotal} ₳)</span>
+									</span>
 								</div>
 								<div className='flex justify-between text-gray-600'>
 									<span>Shipping</span>
-									<span>{formatPrice(shippingCost)}</span>
+									<span>
+										{formatPrice(shippingCost)}
+										<span className="ml-2 text-xs text-emerald-700 font-semibold">({adaSummary.shipping} ₳)</span>
+									</span>
 								</div>
 								{appliedDiscount && (
 									<div className='flex justify-between text-green-600'>
 										<span>Discount</span>
-										<span>-{formatPrice(discountAmount)}</span>
+										<span>
+											-{formatPrice(discountAmount)}
+											<span className="ml-2 text-xs text-emerald-700 font-semibold">(-{adaSummary.discount} ₳)</span>
+										</span>
 									</div>
 								)}
 							</div>
 
 							<div className='flex justify-between py-4 border-t border-gray-200 text-lg font-bold text-gray-900'>
 								<span>Total</span>
-								<span>{formatPrice(total)}</span>
+								<span>
+									{formatPrice(total)}
+									<span className="ml-2 text-base text-emerald-700 font-bold">({adaSummary.total} ₳)</span>
+								</span>
 							</div>
 
-							<button
-								onClick={handlePlaceOrder}
-								className='w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 px-6 rounded-xl font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 transform hover:scale-[1.02] shadow-lg'>
-								Complete Order
-							</button>
+							{/* Cardano payment button */}
+							<div className='flex flex-col gap-4 mt-4'>
+								<button
+									disabled={isPaying}
+									onClick={handlePayWithCardano}
+									className='w-full bg-gradient-to-r from-green-700 to-green-800 text-white py-4 px-6 rounded-xl font-semibold hover:from-green-800 hover:to-green-900 transition-all duration-200 transform hover:scale-[1.02] shadow-lg'>
+									{isPaying ? "Processing Payment..." : "Pay with Cardano"}
+								</button>
+								{txStatus && (
+									<div className={`text-center text-sm ${txStatus.startsWith("Payment sent") ? "text-green-600" : "text-red-600"}`}>{txStatus}</div>
+								)}
+							</div>
 
 							<div className='flex items-center justify-center mt-4 text-sm text-gray-500'>
 								<svg

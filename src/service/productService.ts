@@ -2,6 +2,7 @@
 // Create a separate file: /services/productService.ts or include in your existing service file
 
 const API_BASE_URL = "https://farmplace-backend-api.onrender.com/api/v1";
+// const API_BASE_URL = "http://localhost/api/v1";
 
 export interface Product {
 	_id: string;
@@ -14,6 +15,7 @@ export interface Product {
 	priceADA?: number;
 	images: string[];
 	userId: string;
+	wallet: string;
 	createdAt: string;
 	updatedAt: string;
 	__v: number;
