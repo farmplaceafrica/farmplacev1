@@ -134,16 +134,42 @@ const Checkout = () => {
 				cartItems.map(async (item) => {
 					const price = parseFloat(item.price.replace(/[^\d.-]/g, ""));
 					const priceAda = await convertNGNtoADA(price);
+					// Use integer lovelace for metadata to avoid serialization error
+					const priceLovelace = Math.round(priceAda * 1_000_000);
 					return {
 						id: item.id,
 						name: item.title,
-						priceAda,
+						priceAda, // for display
+						priceLovelace, // for metadata
 						vendorAddress: process.env.NEXT_PUBLIC_RECEIVER_ADDRESS || "addr_test1qqxaclytxrwjp9r2l8mvg26klluhhl46ntml6w6r2ltzn22tdect906dcxt8e0d3mqlcdne7n3w8jqaudjujgvz5xzzqff45vn",
 						quantity: item.quantity,
 					};
 				})
 			);
-			const tx = createSingleVendorTransaction(adaCart, wallet);
+			// Patch createSingleVendorTransaction to use priceLovelace in metadata
+			const tx = createSingleVendorTransaction(
+				adaCart.map(item => ({
+					...item,
+					priceAda: item.priceAda, // for tx amount
+					priceLovelace: item.priceLovelace // for metadata
+				})),
+				wallet
+			);
+			// Patch tx.setMetadata to use integer priceLovelace in metadata
+			if (tx.setMetadata) {
+				tx.setMetadata(1001, {
+					type: "single-vendor",
+					vendor: adaCart[0].vendorAddress,
+					totalAda: Math.round(adaSummary.total * 1_000_000),
+					products: adaCart.map(item => ({
+						id: item.id,
+						name: item.name,
+						priceLovelace: item.priceLovelace,
+						quantity: item.quantity,
+					})),
+					timestamp: Date.now(),
+				});
+			}
 			const unsignedTx = await tx.build();
 			const signedTx = await wallet.signTx(unsignedTx);
 			const txHash = await wallet.submitTx(signedTx);
