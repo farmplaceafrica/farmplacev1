@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/components/context/CardContext";
 import { createSingleVendorTransaction, convertNGNtoADA } from "@/utils";
 import { useWallet } from "@meshsdk/react";
+import { createHash } from "crypto";
 
 const Checkout = () => {
 	const { cartItems, clearCart } = useCart();
@@ -120,6 +121,11 @@ const Checkout = () => {
 		})();
 	}, [subtotal, shippingCost, discountAmount, total]);
 
+	// Helper to hash address for metadata
+	const hashAddress = (address: string) => {
+		return createHash("sha256").update(address).digest("hex").slice(0, 64);
+	};
+
 	// Cardano payment handler
 	const handlePayWithCardano = async () => {
 		if (!wallet || !connected) {
@@ -139,9 +145,9 @@ const Checkout = () => {
 					return {
 						id: item.id,
 						name: item.title,
-						priceAda, // for display
-						priceLovelace, // for metadata
-						vendorAddress: process.env.NEXT_PUBLIC_RECEIVER_ADDRESS || "addr_test1qqxaclytxrwjp9r2l8mvg26klluhhl46ntml6w6r2ltzn22tdect906dcxt8e0d3mqlcdne7n3w8jqaudjujgvz5xzzqff45vn",
+						priceAda,
+						priceLovelace, 
+						vendorAddress: "addr_test1qqxaclytxrwjp9r2l8mvg26klluhhl46ntml6w6r2ltzn22tdect906dcxt8e0d3mqlcdne7n3w8jqaudjujgvz5xzzqff45vn",
 						quantity: item.quantity,
 					};
 				})
@@ -155,11 +161,11 @@ const Checkout = () => {
 				})),
 				wallet
 			);
-			// Patch tx.setMetadata to use integer priceLovelace in metadata
+			// Patch tx.setMetadata to use integer priceLovelace in metadata and hash vendor address
 			if (tx.setMetadata) {
 				tx.setMetadata(1001, {
 					type: "single-vendor",
-					vendor: adaCart[0].vendorAddress,
+					vendor: hashAddress(adaCart[0].vendorAddress),
 					totalAda: Math.round(adaSummary.total * 1_000_000),
 					products: adaCart.map(item => ({
 						id: item.id,
